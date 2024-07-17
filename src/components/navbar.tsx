@@ -75,6 +75,16 @@ export function Navbar() {
                 href="/courses">
                 Courses
               </Link>
+              <Link
+                className="text-muted-foreground hover:text-foreground"
+                href="/careers">
+                Careers
+              </Link>
+              <Link
+                className="text-muted-foreground hover:text-foreground"
+                href="/contact-us">
+                Contact Us
+              </Link>
               <div>
                 {user?.role === 1 ? (
                   <Accordion type="single" collapsible>
@@ -84,7 +94,7 @@ export function Navbar() {
                       </AccordionTrigger>
                       <AccordionContent className="grid gap-y-2 text-lg font-medium pl-4">
                         <Link
-                          href="/admin/dashboard/home"
+                          href="/admin/dashboard"
                           className="text-muted-foreground hover:text-foreground">
                           Home
                         </Link>
@@ -113,6 +123,7 @@ export function Navbar() {
                   </Accordion>
                 ) : null}
               </div>
+              
             </nav>
           </SheetContent>
         </Sheet>
@@ -182,7 +193,7 @@ export function Navbar() {
           <div className="hidden md:flex">
             {user?.role === 1 ? (
               <Button className="rounded-full" asChild>
-                <Link href="/admin/dashboard/home">Dashboard</Link>
+                <Link href="/admin/dashboard">Dashboard</Link>
               </Button>
             ) : null}
           </div>
