@@ -50,7 +50,7 @@ export default function DashbordHome() {
     } catch (error) {
       console.error("Error fetching enrollments: ", error);
     }
-  }, [refreshKey]);
+  }, [refreshKey, toast]);
 
   async function handelApprove(id: string) {
     console.log(id);

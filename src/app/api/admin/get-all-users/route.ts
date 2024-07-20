@@ -2,8 +2,8 @@ import dbConnect from "@/lib/dbConnection";
 import UserModel from "@/models/Users";
 
 export async function GET() {
+  await dbConnect();
   try {
-    await dbConnect();
     const users = await UserModel.find().select("-password");
 
     return Response.json({ users }, { status: 200 });

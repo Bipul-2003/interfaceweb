@@ -45,7 +45,7 @@ export default function UsersAdministrationPage() {
     } catch (error) {
       console.error("Error fetching users: ", error);
     }
-  }, []);
+  }, [toast]);
 
   const onSubmit = async (id: string, role: string) => {
     setcreatingCourse(true);

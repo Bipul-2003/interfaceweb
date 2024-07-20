@@ -65,26 +65,35 @@ export function Navbar() {
                 <Package2 className="h-6 w-6" />
                 <span className="sr-only">Acme Inc</span>
               </Link>
-              <Link
-                href="/"
-                className="text-muted-foreground hover:text-foreground">
-                Home
-              </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                href="/courses">
-                Courses
-              </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                href="/careers">
-                Careers
-              </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                href="/contact-us">
-                Contact Us
-              </Link>
+              <SheetClose asChild>
+                <Link
+                  href="/"
+                  className="text-muted-foreground hover:text-foreground">
+                  Home
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/courses">
+                  Courses
+                </Link>
+              </SheetClose>
+
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/careers">
+                  Careers
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/contact-us">
+                  Contact Us
+                </Link>
+              </SheetClose>
               <div>
                 {user?.role === 1 ? (
                   <Accordion type="single" collapsible>
@@ -93,37 +102,46 @@ export function Navbar() {
                         Dashbord
                       </AccordionTrigger>
                       <AccordionContent className="grid gap-y-2 text-lg font-medium pl-4">
-                        <Link
-                          href="/admin/dashboard"
-                          className="text-muted-foreground hover:text-foreground">
-                          Home
-                        </Link>
-                        <Link
-                          href="/admin/dashboard/enrollments"
-                          className="text-muted-foreground hover:text-foreground">
-                          Enrollments
-                        </Link>
-                        <Link
-                          href="/admin/dashboard/sessions"
-                          className="text-muted-foreground hover:text-foreground">
-                          Session
-                        </Link>
-                        <Link
-                          href="/admin/dashboard/courses"
-                          className="text-muted-foreground hover:text-foreground">
-                          Courses
-                        </Link>
-                        <Link
-                          href="/admin/dashboard/students"
-                          className="text-muted-foreground hover:text-foreground">
-                          Students
-                        </Link>
+                        <SheetClose asChild>
+                          <Link
+                            href="/admin/dashboard"
+                            className="text-muted-foreground hover:text-foreground">
+                            Home
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/admin/dashboard/enrollments"
+                            className="text-muted-foreground hover:text-foreground">
+                            Enrollments
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/admin/dashboard/sessions"
+                            className="text-muted-foreground hover:text-foreground">
+                            Session
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/admin/dashboard/courses"
+                            className="text-muted-foreground hover:text-foreground">
+                            Courses
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/admin/dashboard/students"
+                            className="text-muted-foreground hover:text-foreground">
+                            Users
+                          </Link>
+                        </SheetClose>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
                 ) : null}
               </div>
-              
             </nav>
           </SheetContent>
         </Sheet>

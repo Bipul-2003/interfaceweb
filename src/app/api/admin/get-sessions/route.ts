@@ -8,8 +8,8 @@ export async function GET(req: Request) {
   const limit = url.searchParams.get("limit");
   console.log(limit);
 
+  await dbConnect();
   try {
-    await dbConnect();
     const session = await auth();
     console.log(session?.user);
 
