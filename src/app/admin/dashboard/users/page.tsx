@@ -29,11 +29,13 @@ import {
 import getSession from "@/utils/getSession";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { User } from "next-auth";
 
 export default function UsersAdministrationPage() {
 
   const router = useRouter();
   const [users, setUsers] = useState<[]>([]);
+  const [user, setUser] = useState<User>();
   const [creatingCourse, setCreatingCourse] = useState<boolean>(false);
 
   const fetchData = async (limit: number = 20) => {
@@ -45,20 +47,23 @@ export default function UsersAdministrationPage() {
     }
   };
 
-  const fetchUser = async () => {
-    const session = await getSession();
-    if (!session?.user) {
-      router.replace("/sign-in");
-    }
-    if (session?.user?.role !== 1) {
-      router.replace("/");
-    }
-  }
 
   useEffect(() => {
-    fetchData();
+    
+    const fetchUser = async () => {
+      const session = await getSession();
+      setUser(session?.user);
+      
+      if (!session?.user) {
+        router.replace("/sign-in");
+      }
+      if (session?.user?.role !== 1) {
+        router.replace("/");
+      }
+    }
     fetchUser();
-  },[]);
+    fetchData();
+  },[user,router]);
 
   const onSubmit = async (id: string, role: string) => {
     setCreatingCourse(true);
