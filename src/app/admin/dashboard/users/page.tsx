@@ -27,8 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import getSession from "@/utils/getSession";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function UsersAdministrationPage() {
+
+  const router = useRouter();
   const [users, setUsers] = useState<[]>([]);
   const [creatingCourse, setCreatingCourse] = useState<boolean>(false);
 
@@ -41,9 +45,20 @@ export default function UsersAdministrationPage() {
     }
   };
 
+  const fetchUser = async () => {
+    const session = await getSession();
+    if (!session?.user) {
+      router.replace("/sign-in");
+    }
+    if (session?.user?.role !== 1) {
+      router.replace("/");
+    }
+  }
+
   useEffect(() => {
     fetchData();
-  });
+    fetchUser();
+  },[]);
 
   const onSubmit = async (id: string, role: string) => {
     setCreatingCourse(true);
@@ -142,6 +157,7 @@ export default function UsersAdministrationPage() {
             }
             className="max-w-sm border-2"
           />
+          <Button onClick={()=>fetchData()} className="mx-2">Refresh</Button>
         </div>
         <Table>
           <TableHeader>
