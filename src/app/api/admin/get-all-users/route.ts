@@ -2,6 +2,8 @@ import dbConnect from "@/lib/dbConnection";
 import UserModel from "@/models/Users";
 
 export async function GET() {
+  console.log("GET /api/admin/get-all-users");
+  
   await dbConnect();
   try {
     const users = await UserModel.find().select("-password");
