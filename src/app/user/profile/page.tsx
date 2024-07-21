@@ -125,7 +125,7 @@ export default function DataTableDemo() {
           return;
         }
         const [userResponse, enrollmentsResponse] = await Promise.all([
-          axios.get(`/api/get-user-details?uid=${session.user.id}`),
+          axios.get('/api/get-user-details'),
           axios.get("/api/get-user-enrollments"),
         ]);
 

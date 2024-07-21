@@ -7,17 +7,16 @@ import mongoose from "mongoose";
 export async function GET() {
   await dbConnect();
 
-  const session = await getSession();
-  if (!session) {
-    return Response.json(
-      { message: "Unauthorized Please login" },
-      { status: 401 }
-    );
-  }
-  const user = session.user;
-  console.log(user);
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return Response.json(
+        { message: "Unauthorized Please login" },
+        { status: 401 }
+      );
+    }
+    const user = session.user;
+
     const enrolments = await EnrollmentModel.aggregate([
       {
         $match: {
@@ -90,5 +89,4 @@ export async function GET() {
   }
 }
 
-
-export const dynamic  = "force-dynamic";
+export const dynamic = "force-dynamic";

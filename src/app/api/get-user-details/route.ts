@@ -5,18 +5,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   await dbConnect();
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { message: "Unauthorized Please login" },
-      { status: 401 }
-    );
-  }
-  const id = session.user.id;
-  console.log(id);
 
   try {
-  
+    const session = await getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { message: "Unauthorized Please login" },
+        { status: 401 }
+      );
+    }
+    const id = session.user.id;
+    // console.log(id);
+
     const user = await UserModel.findById(id).select("-password");
 
     if (!user) {
@@ -32,5 +32,4 @@ export async function GET(req: NextRequest) {
   }
 }
 
-
-export const dynamic  = "force-dynamic";
+export const dynamic = "force-dynamic";
