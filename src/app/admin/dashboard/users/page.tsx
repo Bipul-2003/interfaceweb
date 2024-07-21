@@ -29,13 +29,10 @@ import {
 import getSession from "@/utils/getSession";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { User } from "next-auth";
 
 export default function UsersAdministrationPage() {
-
   const router = useRouter();
   const [users, setUsers] = useState<[]>([]);
-  const [user, setUser] = useState<User>();
   const [creatingCourse, setCreatingCourse] = useState<boolean>(false);
 
   const fetchData = async (limit: number = 20) => {
@@ -47,23 +44,19 @@ export default function UsersAdministrationPage() {
     }
   };
 
-
   useEffect(() => {
-    
     const fetchUser = async () => {
       const session = await getSession();
-      setUser(session?.user);
-      
       if (!session?.user) {
         router.replace("/sign-in");
       }
       if (session?.user?.role !== 1) {
         router.replace("/");
       }
-    }
+    };
     fetchUser();
     fetchData();
-  },[user,router]);
+  }, [router]);
 
   const onSubmit = async (id: string, role: string) => {
     setCreatingCourse(true);
@@ -120,8 +113,7 @@ export default function UsersAdministrationPage() {
         return (
           <Select
             defaultValue={user_role}
-            onValueChange={(value) => onSubmit(id, value)}
-          >
+            onValueChange={(value) => onSubmit(id, value)}>
             <SelectTrigger className="max-w-24">
               <SelectValue />
             </SelectTrigger>
@@ -156,13 +148,17 @@ export default function UsersAdministrationPage() {
         <div className="flex justify-end py-2">
           <Input
             placeholder="Filter user..."
-            value={(table.getColumn("username")?.getFilterValue() as string) ?? ""}
+            value={
+              (table.getColumn("username")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
               table.getColumn("username")?.setFilterValue(event.target.value)
             }
             className="max-w-sm border-2"
           />
-          <Button onClick={()=>fetchData()} className="mx-2">Refresh</Button>
+          <Button onClick={() => fetchData()} className="mx-2">
+            Refresh
+          </Button>
         </div>
         <Table>
           <TableHeader>
@@ -172,7 +168,10 @@ export default function UsersAdministrationPage() {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -181,17 +180,24 @@ export default function UsersAdministrationPage() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
