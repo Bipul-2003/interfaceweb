@@ -38,3 +38,6 @@ export async function PATCH(req: Request) {
     );
   }
 }
+
+
+export const dynamic  = "force-dynamic";

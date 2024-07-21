@@ -18,3 +18,5 @@ export async function GET(
     return Response.json({ message: "Error fetching course" }, { status: 500 });
   }
 }
+
+export const dynamic  = "force-dynamic";

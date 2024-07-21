@@ -14,3 +14,6 @@ export async function GET(req: Request) {
     return Response.json({ message: "Error getting course" }, { status: 500 });
   }
 }
+
+
+export const dynamic  = "force-dynamic";

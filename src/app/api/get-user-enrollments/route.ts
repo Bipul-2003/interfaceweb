@@ -89,3 +89,6 @@ export async function GET() {
     return Response.json({ message: "Error getting users" }, { status: 500 });
   }
 }
+
+
+export const dynamic  = "force-dynamic";

@@ -18,3 +18,5 @@ export async function GET(req: Request, { params }: {params:{cid:string}}) {
     );
   }
 }
+
+export const dynamic  = "force-dynamic";

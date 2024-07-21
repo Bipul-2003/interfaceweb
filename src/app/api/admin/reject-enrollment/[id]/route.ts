@@ -79,3 +79,5 @@ export async function GET(req: Request,{ params }: { params: { id: string } }) {
     return Response.json({ message: "Internal server error" }, { status: 500 });
   }
 }
+
+export const dynamic  = "force-dynamic";
