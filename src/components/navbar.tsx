@@ -37,7 +37,7 @@ export function Navbar() {
   useEffect(() => {
     const fetchUser = async () => {
       const session = await getSession();
-      console.log(session?.user);
+      // console.log(session?.user);
 
       setUser(session?.user);
     };
@@ -63,20 +63,13 @@ export function Navbar() {
                 href="#"
                 className="flex items-center gap-2 text-lg font-semibold">
                 <Package2 className="h-6 w-6" />
-                <span className="sr-only">Acme Inc</span>
+                <span className="sr-only">Interface Hub</span>
               </Link>
               <SheetClose asChild>
                 <Link
                   href="/"
                   className="text-muted-foreground hover:text-foreground">
                   Home
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link
-                  className="text-muted-foreground hover:text-foreground"
-                  href="/courses">
-                  Courses
                 </Link>
               </SheetClose>
 
@@ -94,11 +87,44 @@ export function Navbar() {
                   Contact Us
                 </Link>
               </SheetClose>
+
+              <div className="">
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-muted-foreground text-lg hover:text-foreground h-2">
+                      Offerings
+                    </AccordionTrigger>
+                    <AccordionContent className="grid gap-y-2 text-lg font-medium pl-4">
+                      <SheetClose asChild>
+                        <Link
+                          href="/courses"
+                          className="text-muted-foreground hover:text-foreground">
+                          Training & Workshops
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/"
+                          className="text-muted-foreground hover:text-foreground">
+                          Products
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/"
+                          className="text-muted-foreground hover:text-foreground">
+                          Services
+                        </Link>
+                      </SheetClose>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
               <div>
                 {user?.role === 1 ? (
                   <Accordion type="single" collapsible>
                     <AccordionItem value="item-1">
-                      <AccordionTrigger className="text-muted-foreground text-lg hover:text-foreground">
+                      <AccordionTrigger className="text-muted-foreground text-lg hover:text-foreground h-2">
                         Dashbord
                       </AccordionTrigger>
                       <AccordionContent className="grid gap-y-2 text-lg font-medium pl-4">
@@ -147,7 +173,7 @@ export function Navbar() {
         </Sheet>
         <section>
           <Link href="/" className="text-2xl font-bold">
-            Interface
+            Interface Hub
           </Link>
         </section>
         <section className="hidden md:flex">

@@ -52,19 +52,19 @@ export default function ContactUs() {
               Contact Information
             </h2>
             <div className="space-y-4">
-              <div className="grid gap-1">
+              {/* <div className="grid gap-1">
                 <h3 className="text-lg font-semibold">Address</h3>
                 <p className="text-muted-foreground">
                   123 Main Street, Anytown USA 12345
                 </p>
-              </div>
+              </div> */}
               <div className="grid gap-1">
                 <h3 className="text-lg font-semibold">Phone</h3>
-                <p className="text-muted-foreground">+1 (555) 555-5555</p>
+                <p className="text-muted-foreground">+1 (614) 602-2332</p>
               </div>
               <div className="grid gap-1">
                 <h3 className="text-lg font-semibold">Email</h3>
-                <p className="text-muted-foreground">info@acme.com</p>
+                <p className="text-muted-foreground">ifaceh0@outlook.com</p>
               </div>
             </div>
           </div>

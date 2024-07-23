@@ -21,6 +21,7 @@ export async function POST(req: Request) {
 
     if (isCodeValid && isCodeNotExp) {
       user.isVerified = true;
+      user.verifyCode = "";
       await user.save();
       return Response.json(
         {

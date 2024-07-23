@@ -3,8 +3,8 @@ import Link from "next/link"
 
 export default function Footer() {
   return (
-    <footer className="bg-muted py-12">
-      <div className="container max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="bg-muted py-4">
+      {/* <div className="container max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
           <Link href="#" className="flex items-center gap-2" prefetch={false}>
             <MountainIcon className="h-6 w-6" />
@@ -54,9 +54,9 @@ export default function Footer() {
             (555) 555-5555
           </p>
         </div>
-      </div>
+      </div> */}
       <div className="container max-w-7xl mt-8 text-center text-sm text-muted-foreground">
-        &copy; 2024 Interface Software Academy. All rights reserved.
+        &copy; 2024 Interface Hub, LLC. All rights reserved.
       </div>
     </footer>
   )

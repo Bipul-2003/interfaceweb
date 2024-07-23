@@ -4,37 +4,37 @@ export async function POST(req: Request) {
   await dbConnect();
 
   try {
-    const { username,
-        email,
-        phonenumber,
-        password,
-        firstname,
-        middlename,
-        lastname,
-        verifyCode,
+    const {
+      username,
+      email,
+      phonenumber,
+      password,
+      firstname,
+      middlename,
+      lastname,
+      verifyCode,
+    } = await req.json();
 
-        } = await req.json();
+    const existingUser = await UserModel.findOne({ username });
+    if (existingUser) {
+      return Response.json(
+        { message: "Username already exists" },
+        { status: 400 }
+      );
+    }
 
-        const existingUser = await UserModel.findOne({username});
-        if (existingUser) {
-          return Response.json(
-            { message: "User already exists" },
-            { status: 400 }
-          );
-        }
-
-        const verifyCodeExpire = new Date(Date.now() + 10 * 60 * 1000); //10 mins
+    const verifyCodeExpire = new Date(Date.now() + 10 * 60 * 1000); //10 mins
 
     const newUser = new UserModel({
-        username,
-        email,
-        phonenumber,
-        password,
-        firstname,
-        middlename,
-        lastname,
-        verifyCode,
-        verifyCodeExpire
+      username,
+      email,
+      phonenumber,
+      password,
+      firstname,
+      middlename,
+      lastname,
+      verifyCode,
+      verifyCodeExpire,
     });
 
     await newUser.save();
@@ -45,9 +45,6 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("Error creating user:", error);
-    return Response.json(
-      { message: "Error creating user" },
-      { status: 500 }
-    );
+    return Response.json({ message: "Error creating user" }, { status: 500 });
   }
 }
