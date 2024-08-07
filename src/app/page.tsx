@@ -33,20 +33,15 @@ export default function page() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <div className="inline-block rounded-lg bg-gray-200 px-3 py-1 text-sm">
-                Small Business Impact
+                Fact Check
               </div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                 Powering the Global Economy
               </h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Small businesses are the backbone of the global economy,
-                accounting for over 90% of all businesses and employing billions
-                of people worldwide. Interface Hub is dedicated to supporting
-                these vital engines of growth and innovation.
-              </p>
+              
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl pt-16 items-center gap-6 lg:grid-cols-3 lg:gap-12">
+          <div className="mx-auto grid max-w-5xl pt-10 items-center gap-6 lg:grid-cols-3 lg:gap-12">
             <div className="grid gap-1">
               <h3 className="text-3xl font-bold text-center">90%</h3>
               <p className="text-muted-foreground text-center">
@@ -66,6 +61,12 @@ export default function page() {
               </p>
             </div>
           </div>
+          <p className="text-center md:px-36 mt-10 text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Small businesses are the backbone of the global economy,
+                accounting for over 90% of all businesses and employing billions
+                of people worldwide. Interface Hub is dedicated to supporting
+                these vital engines of growth and innovation.
+              </p>
         </div>
       </section>
       <section className=" py-20">

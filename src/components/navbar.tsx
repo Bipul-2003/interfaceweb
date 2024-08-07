@@ -72,22 +72,6 @@ export function Navbar() {
                   Home
                 </Link>
               </SheetClose>
-
-              <SheetClose asChild>
-                <Link
-                  className="text-muted-foreground hover:text-foreground"
-                  href="/careers">
-                  Careers
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link
-                  className="text-muted-foreground hover:text-foreground"
-                  href="/contact-us">
-                  Contact Us
-                </Link>
-              </SheetClose>
-
               <div className="">
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item-1">
@@ -120,11 +104,34 @@ export function Navbar() {
                   </AccordionItem>
                 </Accordion>
               </div>
+
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/careers">
+                  Careers
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/about-us">
+                  About Us
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
+                  className="text-muted-foreground hover:text-foreground"
+                  href="/contact-us">
+                  Contact Us
+                </Link>
+              </SheetClose>
+
               <div>
                 {user?.role === 1 ? (
                   <Accordion type="single" collapsible>
                     <AccordionItem value="item-1">
-                      <AccordionTrigger className="text-muted-foreground text-lg hover:text-foreground h-2">
+                      <AccordionTrigger className="text-muted-foreground text-lg hover:text-foreground h-2 bg-muted rounded-md">
                         Dashbord
                       </AccordionTrigger>
                       <AccordionContent className="grid gap-y-2 text-lg font-medium pl-4">
@@ -172,7 +179,7 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
         <section>
-          <Link href="/" className="text-2xl font-bold">
+          <Link href="/" className="text-base font-bold">
             Interface Hub
           </Link>
         </section>
@@ -218,6 +225,15 @@ export function Navbar() {
                     asChild
                     className={navigationMenuTriggerStyle()}>
                     <Link href="/careers">Careers</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </div>
+              <div className="">
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}>
+                    <Link href="/about-us">About Us</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </div>

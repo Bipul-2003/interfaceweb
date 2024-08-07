@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     dateRange,
     instructor,
     maxCapacity,
-    googlemeetLink,
+    googlemeetLink, 
     maxWaitingCapacity,
     price,
     startTime,

@@ -6,12 +6,14 @@ import React, { useEffect, useState } from "react";
 import { CourseType } from "@/models/Courses";
 import {
   Card,
+  CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Clock2 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface CoursesResponse {
   courses: CourseType[];
@@ -42,20 +44,37 @@ const Courses = () => {
   }
   return (
     <div className="h-full w-full flex flex-col pt-24">
-      <h1 className="font-bold text-3xl md:text-4xl mb-6">Courses</h1>
-      <div className="grid grid-cols-2 py-10 md:grid-cols-4 gap-4 ">
+      <h1 className="font-bold text-3xl md:text-4xl ">Courses</h1>
+      <p className="text-muted-foreground">
+        Explore the courses to learn and grow.
+      </p>
+      <div className="grid grid-cols-2 py-8 md:grid-cols-4 gap-8 ">
         {allcourses.courses.map((course: CourseType) => (
-          <Card key={String(course._id)} className="p-2 md:p-8">
-            <Link href={`/courses/${String(course._id)}`}>
-              <CardHeader>
-                <CardTitle className="text-base md:text-2xl ">{course.title}</CardTitle>
-                {/* <CardDescription>{course.courseContent}</CardDescription> */}
-              </CardHeader>
-              <CardFooter className="text-xs md:text-sm">
-                <Clock2 className="size-4 mr-2" />
-                {`${course.duration} hours`}
-              </CardFooter>
-            </Link>
+          <Card key={String(course._id)}>
+            <img
+              src="/learning.svg"
+              alt="Course Image"
+              className="rounded-t-lg object-fit object-left w-full aspect-[4/2] bg-muted"
+            />
+            <CardContent className="p-4">
+              <h3 className="text-2xl font-bold">{course.title}</h3>
+              {/* <p className="text-muted-foreground text-sm line-clamp-2">
+    Learn the essential skills to build modern, responsive web applications.
+  </p> */}
+              <div className=" flex-row md:flex justify-between items-center ">
+                <div className="text-sm font-medium">
+                  <span className="text-primary">
+                    {" "}
+                    {`${course.duration} hours`}
+                  </span>
+                </div>
+                <Button className="my-4 " asChild>
+                  <Link href={`/courses/${String(course._id)}`}>
+                    Get Sessions
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         ))}
       </div>

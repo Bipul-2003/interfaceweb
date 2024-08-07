@@ -16,6 +16,7 @@ import axios from "axios";
 import TanstackTable from "@/components/Table";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/loader";
 
 interface User {
   _id: string;
@@ -33,9 +34,10 @@ export default function DashbordHome() {
     } | null;
   }>({ enrollments: [], totalcounts: {} });
   const [refreshKey, setRefreshKey] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     try {
+      setLoading(true);
       const fetchData = async (limit: number = 20) => {
         const [enrollments, totalcounts] = await Promise.all([
           axios.get(`/api/admin/get-enrollments?limit=${limit}`),
@@ -49,6 +51,8 @@ export default function DashbordHome() {
       fetchData();
     } catch (error) {
       console.error("Error fetching enrollments: ", error);
+    } finally {
+      setLoading(false);
     }
   }, [refreshKey]);
 
@@ -120,6 +124,19 @@ export default function DashbordHome() {
       cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
     },
     {
+      id: "details", // Custom ID for the column
+      header: "Deatils",
+      // accessorFn: (row) => row.user.username ?? "N/A", // Safely access nested properties
+      cell: ({ row }) => (
+        <div className="">
+          <p>{`${row.original.user.firstname} ${row.original.user.middlename} ${row.original.user.lastname}`}</p>
+          <p className="text-muted-foreground pt-1 text-xs">
+            {row.original.user.email}
+          </p>
+        </div>
+      ), // Display the value or a default text
+    },
+    {
       id: "Course", // Custom ID for the column
       header: "Course",
       accessorFn: (row) => row.session.course.title ?? "N/A", // Safely access nested properties
@@ -189,8 +206,8 @@ export default function DashbordHome() {
     //   },
     // },
     {
-      accessorKey: "bookingConfirmed",
-      header: "Booking Confirmations",
+      accessorKey: "status",
+      header: "Status",
       cell: ({ row }) =>
         row.original.status === "booked" ? (
           <p className="">Confirmed</p>
@@ -241,6 +258,15 @@ export default function DashbordHome() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }  
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-accent/50 ">

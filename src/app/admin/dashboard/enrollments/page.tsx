@@ -95,6 +95,17 @@ export default function EnrollmentsAdministrationPage() {
       cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
     },
     {
+      id: "details", // Custom ID for the column
+      header: "Deatils",
+      // accessorFn: (row) => row.user.username ?? "N/A", // Safely access nested properties
+      cell: ({ row }) => (
+        <div className="">
+          <p>{`${row.original.user.firstname} ${row.original.user.middlename} ${row.original.user.lastname}`}</p>
+          <p className="text-muted-foreground pt-1 text-xs">{row.original.user.email}</p>
+        </div>
+      ) // Display the value or a default text
+    },
+    {
       id: "course", // Custom ID for the column
       header: "Course",
       accessorFn: (row) => row.session.course.title ?? "N/A", // Safely access nested properties
@@ -164,8 +175,8 @@ export default function EnrollmentsAdministrationPage() {
       },
     },
     {
-      accessorKey: "bookingConfirmed",
-      header: "Booking Confirmations",
+      accessorKey: "status",
+      header: "Status",
          
       cell: ({ row }) =>
         row.original.status === "booked" ? (

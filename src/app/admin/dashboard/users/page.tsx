@@ -156,9 +156,6 @@ export default function UsersAdministrationPage() {
             }
             className="max-w-sm border-2"
           />
-          <Button onClick={() => fetchData()} className="mx-2">
-            Refresh
-          </Button>
         </div>
         <Table>
           <TableHeader>

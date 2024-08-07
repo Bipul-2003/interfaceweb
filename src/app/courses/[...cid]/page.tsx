@@ -140,8 +140,7 @@ const Course = ({ params }: { params: { cid: string } }) => {
   
   
 
-  console.log(state.sessions);
-
+  
   if (loading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
@@ -151,11 +150,11 @@ const Course = ({ params }: { params: { cid: string } }) => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col pt-24">
+    <div className="min-h-screen w-full flex flex-col pt-28 ">
       <Dialog
         open={selectedSession}
         onOpenChange={() => setSelectedSession(null)}>
-        <DialogContent className="op">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle className="text-4xl">Details </DialogTitle>
             <DialogDescription className="">
@@ -262,7 +261,7 @@ const Course = ({ params }: { params: { cid: string } }) => {
           </div>
         </DialogContent>
       </Dialog>
-      <h1 className="font-bold text-4xl mb-10 pb-4">{state.course.title}</h1>
+      <h1 className="font-bold text-4xl mb-6 ">{state.course.title}</h1>
       <Tabs defaultValue="content">
         <TabsList>
           <TabsTrigger value="content">Description</TabsTrigger>
@@ -271,7 +270,7 @@ const Course = ({ params }: { params: { cid: string } }) => {
         <TabsContent value="content" className="p-2 max-w-screen-md">
           {state.course.courseContent}
         </TabsContent>
-        <TabsContent value="sessions" className="p-2 max-w-screen-lg">
+        <TabsContent value="sessions" className="p-2 max-w-screen-lg ">
           <div className="grid md:grid-cols-4 gap-4">
             {state.sessions.length !== 0 ? (
               state.sessions.map((session: any) => (

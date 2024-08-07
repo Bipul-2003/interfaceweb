@@ -20,7 +20,7 @@ import { LoadingSpinner } from "./ui/loader";
   status: boolean;
   lable: string;
 }) {
-  console.log(session);
+  // console.log(session);
   
 
   
@@ -29,7 +29,7 @@ import { LoadingSpinner } from "./ui/loader";
   
   return (
     <div className="">
-      <Card >
+      <Card className="bg-muted/40" >
         <CardHeader>
           <CardTitle className="text-xl">{`${new Date(
             session.startDate
