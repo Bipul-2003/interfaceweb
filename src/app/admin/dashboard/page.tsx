@@ -130,9 +130,9 @@ export default function DashbordHome() {
       cell: ({ row }) => (
         <div className="">
           <p>{`${row.original.user.firstname} ${row.original.user.middlename} ${row.original.user.lastname}`}</p>
-          <p className="text-muted-foreground pt-1 text-xs">
+          <Link href={`mailto:${row.original.user.email}`} className="text-muted-foreground pt-1 text-xs">
             {row.original.user.email}
-          </p>
+          </Link>
         </div>
       ), // Display the value or a default text
     },
