@@ -179,8 +179,8 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
         <section>
-          <Link href="/" className="text-base font-bold">
-            Interface Hub
+          <Link href="/" className="text-xl  font-bold">
+            Interface <span className="text-primary">H</span>ub
           </Link>
         </section>
         <section className="hidden md:flex">

@@ -1,5 +1,6 @@
 import {
   ArrowRightIcon,
+  BriefcaseBusiness,
   LaptopIcon,
   PresentationIcon,
   RocketIcon,
@@ -11,20 +12,45 @@ import React from "react";
 export default function page() {
   return (
     <div className="flex min-h-[100dvh] flex-col pt-12">
-      <section className="bg-gradient-to-r from-violet-900 to-indigo-600 py-20  lg:py-32">
+      <section className=" py-20 bg-[url('/world.jpg')] opacity-100  bg-cover bg-right-bottom lg:py-32 relative">
+        {/* <a
+          className="text-gray-400 absolute bottom-0 right-0 text-xs"
+          href="https://www.freepik.com/free-vector/worldwide-connection-gray-background-illustration-vector_3842189.htm#query=world%20background&position=2&from_view=keyword&track=ais_hybrid&uuid=ff4ba993-5213-4e8d-bcf3-4f34040609bf">
+          Image by rawpixel.com on Freepik
+        </a> */}
         <div className="container mx-auto max-w-5xl text-center">
-          <h1 className="text-4xl font-bold text-primary-foreground md:text-6xl">
-            Empowering The World Through Technology
+          {/* <Image className="absolute " src='/lines.svg' height={100} width={100} alt=""></Image> */}
+          <h1 className="text-5xl text-muted font-bold  md:leading-snug antialiased  md:text-6xl">
+            Empowering The{" "}
+            {/* <span className="relative "> */}
+              <div className=" text-black font-normal ">🌎</div>
+              
+              {/* <Image
+                className="absolute right-1 -bottom-3 width-full"
+                src="/lines.svg"
+                height={60}
+                width={60}
+                alt=""
+              /> */}
+            {/* </span>{" "} */}
+            Through Technology
           </h1>
-          <p className="mt-4 text-lg text-primary-foreground md:text-xl px-4">
+          <p className="pt-4 text-lg text-muted  md:text-xl px-4">
             Interface Hub provides the tools, services, and training to help
             small businesses thrive in the digital age.
           </p>
           <Link
             href="#offerings"
-            className="mt-8 inline-flex items-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="mt-8 relative inline-flex items-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             prefetch={false}>
             Explore
+            {/* <Image
+                className="absolute -right-16 -bottom-[2.8rem] -rotate-[30deg] "
+                0src="/circled-arrow.svg"
+                height={120}
+                width={120}
+                alt=""
+              /> */}
           </Link>
         </div>
       </section>
@@ -38,35 +64,70 @@ export default function page() {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                 Powering the Global Economy
               </h2>
-              
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl pt-10 items-center gap-6 lg:grid-cols-3 lg:gap-12">
             <div className="grid gap-1">
-              <h3 className="text-3xl font-bold text-center">90%</h3>
+              {/* <h3 className="text-3xl font-bold text-center">90%</h3> */}
+              <BriefcaseBusiness className="mx-auto size-16 text-primary" />
               <p className="text-muted-foreground text-center">
-                of all businesses worldwide are small businesses
+              <span className="font-bold text-lg text-justify">90%</span> of all businesses worldwide are small businesses
               </p>
             </div>
             <div className="grid gap-1">
-              <h3 className="text-3xl font-bold text-center">2 Billion</h3>
-              <p className="text-muted-foreground text-center">
-                people employed by small businesses globally
+              <h3 className="text-3xl font-bold text-center">
+                <svg
+                  className="size-16 mx-auto text-primary"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="2"
+                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                  />
+                </svg>
+              </h3>
+              <p className="text-muted-foreground text-center ">
+                <span className="font-bold text-lg text-justify">2 Billion</span> people employed by small businesses globally
               </p>
             </div>
             <div className="grid gap-1">
-              <h3 className="text-3xl font-bold text-center">$6 Trillion</h3>
+              <h3 className="text-3xl font-bold text-center mx-auto size-16 text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-chart-no-axes-combined">
+                  <path d="M12 16v5" />
+                  <path d="M16 14v7" />
+                  <path d="M20 10v11" />
+                  <path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15" />
+                  <path d="M4 18v3" />
+                  <path d="M8 14v7" />
+                </svg>
+              </h3>
+              {/* <ChartLine/> */}
               <p className="text-muted-foreground text-center">
-                contributed to the global economy by small businesses
+              <span className="font-bold text-lg text-justify">$6 Trillion</span> contributed to the global economy by small
+                businesses
               </p>
             </div>
           </div>
           <p className="text-center md:px-36 mt-10 text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Small businesses are the backbone of the global economy,
-                accounting for over 90% of all businesses and employing billions
-                of people worldwide. Interface Hub is dedicated to supporting
-                these vital engines of growth and innovation.
-              </p>
+            Small businesses are the backbone of the global economy. Interface
+            Hub is dedicated to supporting these vital engines of growth and
+            innovation.
+          </p>
         </div>
       </section>
       <section className=" py-20">
@@ -82,7 +143,7 @@ export default function page() {
               />
             </div>
             <div className="order-1 md:order-2 space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+              <h2 className="text-xl font-bold tracking-tighter sm:text-4xl">
                 Why Choose Us?
               </h2>
               <p className="text-muted-foreground">

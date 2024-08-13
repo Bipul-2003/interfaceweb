@@ -5,10 +5,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 export default function Component() {
   return (
     <div className="flex flex-col pt-20 min-h-dvh">
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-violet-900">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-[url('/background.jpg')]  bg-cover">
         <div className="container px-4 md:px-6 grid gap-10 lg:grid-cols-[1fr_400px] lg:gap-16">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold text-primary-foreground sm:text-5xl md:text-6xl">
+            <h1 className="text-4xl font-bold  sm:text-5xl md:text-6xl">
               Join the Interface Hub Team
             </h1>
             <p className="text-primary-foreground/80 max-w-[600px] text-xl md:text-2xl py-4">
