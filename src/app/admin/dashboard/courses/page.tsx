@@ -37,6 +37,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { createCourseSchema } from "@/Schemas/createCourseSchema";
 import { Textarea } from "@/components/ui/textarea";
+import { TiptapEditor } from "@/components/TextEditor";
 
 export default function CoursesAdministrationPage() {
   const [courses, setCourses] = useState<[]>([]);
@@ -65,8 +66,9 @@ export default function CoursesAdministrationPage() {
   });
 
   const onSubmit = async (data: z.infer<typeof createCourseSchema>) => {
-    // console.log(data);
+    console.log(data);
     setcreatingCourse(true);
+
     try {
       const response = await axios.post("/api/create-course", data);
 
@@ -240,7 +242,8 @@ export default function CoursesAdministrationPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} className="h-36" />
+                        {/* <Textarea {...field} className="h-36" /> */}
+                        <TiptapEditor content={field.value} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

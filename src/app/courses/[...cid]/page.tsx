@@ -15,10 +15,10 @@ import {
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 import { useToast } from "@/components/ui/use-toast";
+import SessionCards from "@/components/SessionCards";
 import getSession from "@/utils/getSession";
 import { User } from "next-auth";
 import { SessionType } from "@/models/Sessions";
-import SessionCards from "@/components/SessionCards";
 
 
 const fetchCourseData = async (id: string) => {
@@ -55,7 +55,36 @@ const Course = ({ params }: { params: { cid: string } }) => {
 
 
 
-  
+  const fetchAndSetData = async () => {
+    setLoading(true);
+    try {
+      const session = await getSession();
+      const { sessions, course } = await fetchCourseData(id);
+      const bookingStatus =
+        ["Enrolled", "Waiting", "Booked"].find((status) =>
+          sessions.some((s: any) =>
+            s[`${status.toLowerCase()}Students`]
+              .toString()
+              .includes(session?.user?.id || " ")
+          )
+        ) || null;
+
+      setStatus(bookingStatus);
+      setState((prevState) => ({
+        ...prevState,
+        user: session?.user || null,
+        sessions,
+        course,
+        loading: false,
+      }));
+    } catch (error) {
+      console.log(error);
+      toast({ title: "Error fetching data", variant: "destructive" });
+      setState((prevState) => ({ ...prevState, loading: false }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createEnrollment = async (sessionId: string) => {
     setSelectedSession(null);
@@ -105,42 +134,11 @@ const Course = ({ params }: { params: { cid: string } }) => {
   };
 
   useEffect(() => {
-    const fetchAndSetData = async () => {
-      setLoading(true);
-      try {
-        const session = await getSession();
-        const { sessions, course } = await fetchCourseData(id);
-        const bookingStatus =
-          ["Enrolled", "Waiting", "Booked"].find((status) =>
-            sessions.some((s: any) =>
-              s[`${status.toLowerCase()}Students`]
-                .toString()
-                .includes(session?.user?.id || " ")
-            )
-          ) || null;
-  
-        setStatus(bookingStatus);
-        setState((prevState) => ({
-          ...prevState,
-          user: session?.user || null,
-          sessions,
-          course,
-          loading: false,
-        }));
-      } catch (error) {
-        console.log(error);
-        toast({ title: "Error fetching data", variant: "destructive" });
-        setState((prevState) => ({ ...prevState, loading: false }));
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchAndSetData();
-  }, [id, toast]);
-  
-  
+  }, [id]);
 
-  
+  console.log(state.sessions);
+
   if (loading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
@@ -150,11 +148,11 @@ const Course = ({ params }: { params: { cid: string } }) => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col pt-28 ">
+    <div className="min-h-screen w-full flex flex-col pt-24">
       <Dialog
         open={selectedSession}
         onOpenChange={() => setSelectedSession(null)}>
-        <DialogContent className="">
+        <DialogContent className="op">
           <DialogHeader>
             <DialogTitle className="text-4xl">Details </DialogTitle>
             <DialogDescription className="">
@@ -261,17 +259,18 @@ const Course = ({ params }: { params: { cid: string } }) => {
           </div>
         </DialogContent>
       </Dialog>
-      <h1 className="font-bold text-4xl mb-6 ">{state.course.title}</h1>
+      <h1 className="font-bold text-3xl  pb-4">{state.course.title}</h1>
       <Tabs defaultValue="content">
         <TabsList>
           <TabsTrigger value="content">Description</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
         </TabsList>
         <TabsContent value="content" className="p-2 max-w-screen-md">
-          {state.course.courseContent}
+          {/* {state.course.courseContent} */}
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: state.course.courseContent }} />
         </TabsContent>
-        <TabsContent value="sessions" className="p-2 max-w-screen-lg ">
-          <div className="grid md:grid-cols-4 gap-4">
+        <TabsContent value="sessions" className="p-2 max-w-screen-lg">
+          <div className="grid md:grid-cols-4 gap-2">
             {state.sessions.length !== 0 ? (
               state.sessions.map((session: any) => (
                 <div key={String(session._id)}>

@@ -16,7 +16,7 @@ import Link from "next/link";
 import logOut from "@/utils/logoutUser";
 import { User } from "next-auth";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Menu, Package2 } from "lucide-react";
+import { Menu, Package2, ShoppingCart, ShoppingCartIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -25,9 +25,11 @@ import {
 } from "./ui/accordion";
 import getSession from "@/utils/getSession";
 import { UserNav } from "./user-nav";
+import { useCart } from "@/context/cartCount";
 
 export function Navbar() {
   const [user, setUser] = useState<User | undefined | null>();
+  const {cartCount} = useCart();
 
   const onclickHandler = async () => {
     const loggedout = await logOut();
@@ -203,7 +205,12 @@ export function Navbar() {
                       <NavigationMenuLink
                         asChild
                         className={navigationMenuTriggerStyle()}>
-                        <Link href="/courses">Training & Workshops</Link>
+                        <Link href="/courses">Training</Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink
+                        asChild
+                        className={navigationMenuTriggerStyle()}>
+                        <Link href="/courses">Workshops</Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink
                         asChild
@@ -258,7 +265,15 @@ export function Navbar() {
             ) : null}
           </div>
           {user ? (
+            <div className="flex items-center space-x-5">
+             <Link href="/cart" className="relative">
+              <ShoppingCart className="w-6 h-6" />
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                {cartCount}
+              </span>
+            </Link>
             <UserNav logout={onclickHandler} user={user} />
+            </div>
           ) : (
             <Button className="rounded-full" asChild>
               <Link href="/sign-in">SignIn</Link>

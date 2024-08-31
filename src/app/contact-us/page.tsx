@@ -61,7 +61,7 @@ export default function ContactUs() {
     <div className="pt-9">
       <section
         id="contact-form"
-        className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+        className="w-full py-12 md:py-24 lg:py-32 bg-[url('/background.jpg')] bg-opacity-40 bg-cover">
         <div className="container px-4 md:px-6 grid gap-12 lg:grid-cols-2 lg:gap-24 ">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tighter">
@@ -128,13 +128,13 @@ export default function ContactUs() {
                   123 Main Street, Anytown USA 12345
                 </p>
               </div> */}
-              <div className="grid gap-1">
+              <div className="grid gap-1 ">
                 <h3 className="text-lg font-semibold">Phone</h3>
-                <p className="text-muted-foreground">+1 (614) 602-2332</p>
+                <p className="text-muted">+1 (614) 602-2332</p>
               </div>
               <div className="grid gap-1">
                 <h3 className="text-lg font-semibold">Email</h3>
-                <p className="text-muted-foreground">ifaceh0@outlook.com</p>
+                <p className="text-muted">support@ifaceh.com</p>
               </div>
             </div>
           </div>

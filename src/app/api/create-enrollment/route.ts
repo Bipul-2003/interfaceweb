@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import dbConnect from "@/lib/dbConnection";
+import CartModel from "@/models/Cart";
 import Enrollment from "@/models/Enrollments";
 import SessionModel from "@/models/Sessions";
 
@@ -7,12 +8,15 @@ export async function POST(req: Request) {
   await dbConnect();
 
   try {
-    const { session} = await req.json();
-    const userSession =await auth()
+    const { session } = await req.json();
+    const userSession = await auth();
 
     const user = userSession?.user?.id;
     if (!userSession) {
-      return Response.json({ message: "Kindly Signin to book" }, { status: 401 });
+      return Response.json(
+        { message: "Kindly Signin to book" },
+        { status: 401 }
+      );
     }
 
     const existingSession = await SessionModel.findById(session);
@@ -49,12 +53,43 @@ export async function POST(req: Request) {
       });
       await enrollment.save();
 
-      const updatedSession = await SessionModel.findByIdAndUpdate(session, {
-        $addToSet: { enrolledStudents: user },
-      }, { new: true });
+      const updatedSession = await SessionModel.findByIdAndUpdate(
+        session,
+        {
+          $addToSet: { enrolledStudents: user },
+        },
+        { new: true }
+      );
+      const cart = await CartModel.findOne({ user: user });
+      if (!cart) {
+        const newCart = new CartModel({
+          user: user,
+          product: [session],
+        });
+        await newCart.save();
+      } else {
+        const updatedCart = await CartModel.findOneAndUpdate(
+          { user: user },
+          {
+            $push: {
+              product: session,
+            },
+          },
+          { new: true }
+        );
+        if (!updatedCart) {
+          return Response.json(
+            { message: "Error updating cart" },
+            { status: 500 }
+          );
+        }
+      }
 
       return Response.json(
-        { message: "Enrolled Successfully. We will contact you soon..", data: updatedSession },
+        {
+          message: "Added to the cart please pay..",
+          data: updatedSession,
+        },
         { status: 200 }
       );
     } else if (
@@ -69,9 +104,13 @@ export async function POST(req: Request) {
       });
       await enrollment.save();
 
-      const updatedSession = await SessionModel.findByIdAndUpdate(session, {
-        $addToSet: { waitingStudents: user },
-      }, { new: true });
+      const updatedSession = await SessionModel.findByIdAndUpdate(
+        session,
+        {
+          $addToSet: { waitingStudents: user },
+        },
+        { new: true }
+      );
 
       return Response.json(
         { message: "You are in waitinglist", data: updatedSession },

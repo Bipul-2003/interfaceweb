@@ -44,20 +44,20 @@ const Courses = () => {
   }
   return (
     <div className="h-full w-full flex flex-col pt-24">
-      <h1 className="font-bold text-3xl md:text-4xl ">Courses</h1>
+      <h1 className="font-bold text-2xl md:text-3xl ">Courses</h1>
       <p className="text-muted-foreground">
         Explore the courses to learn and grow.
       </p>
-      <div className="grid grid-cols-2 py-8 md:grid-cols-4 gap-8 ">
+      <div className="grid grid-cols-2 py-8 md:grid-cols-4 gap-8 mb-36">
         {allcourses.courses.map((course: CourseType) => (
           <Card key={String(course._id)}>
             <img
               src="/learning.svg"
               alt="Course Image"
-              className="rounded-t-lg object-fit object-left w-full aspect-[4/2] bg-muted"
+              className="rounded-t-lg object-fit object-left w-full aspect-[8/2] bg-muted"
             />
             <CardContent className="p-4">
-              <h3 className="text-2xl font-bold">{course.title}</h3>
+              <h3 className="text-xl font-bold">{course.title}</h3>
               {/* <p className="text-muted-foreground text-sm line-clamp-2">
     Learn the essential skills to build modern, responsive web applications.
   </p> */}
