@@ -142,7 +142,7 @@ export default function CartPage() {
 
   // console.log(cartItems[0].price)
   return (
-    <div className="container mx-auto px-4 py-24 max-w-6xl">
+    <div className="container mx-auto px-4 py-24 max-w-8xl">
       <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
       {cartItems.length === 0 ? (
         <p>Your cart is empty.</p>
@@ -167,7 +167,7 @@ export default function CartPage() {
                     <h2 className="font-semibold">
                       {item.session.course.title}
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-xs md:text-base">
                       session: {item.session.sessionno}
                     </p>
                   </div>
@@ -188,7 +188,7 @@ export default function CartPage() {
                   </button>
                 </div> */}
 
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-xs md:text-base">
                   Due:{" "}
                   {new Intl.DateTimeFormat("en-US", {
                     month: "short",
@@ -198,7 +198,7 @@ export default function CartPage() {
                     minute: "numeric",
                   }).format(new Date(item.session.paymentLastDate as string))}
                 </p>
-                <p className="font-semibold">$ {item.session.price}</p>
+                <p className="font-semibold text-xs md:text-base">$ {item.session.price}</p>
                 <button
                   onClick={() => removeItem(item.id)}
                   className="p-1 rounded-full bg-red-100 text-red-500 hover:bg-red-200"

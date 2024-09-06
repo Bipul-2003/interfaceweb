@@ -43,7 +43,7 @@ const Courses = () => {
     );
   }
   return (
-    <div className="h-full w-full flex flex-col pt-24">
+    <div className="h-full w-full flex flex-col pt-24 md:mx-6">
       <h1 className="font-bold text-2xl md:text-3xl ">Courses</h1>
       <p className="text-muted-foreground">
         Explore the courses to learn and grow.

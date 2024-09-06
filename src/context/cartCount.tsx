@@ -1,6 +1,7 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
+import React, { createContext, useContext, useState, ReactNode, use, useEffect } from 'react';
 
 interface CartContextType {
   cartCount: number;
@@ -12,6 +13,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
+
+  const fetchCart = async () => {
+    const response = await axios.get("/api/getCart");
+    console.log(response.data.cartitems);
+    setCartCount(response.data.cartitems.length);
+    // setCartCount(response.data.cartitems);
+  };
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   const updateCart = (value: number) => setCartCount(value);
   const removeFromCart = () => setCartCount((prevCount) => Math.max(0, prevCount - 1));

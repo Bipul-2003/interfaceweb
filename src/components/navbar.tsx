@@ -26,9 +26,12 @@ import {
 import getSession from "@/utils/getSession";
 import { UserNav } from "./user-nav";
 import { useCart } from "@/context/cartCount";
+import axios from "axios";
 
 export function Navbar() {
   const [user, setUser] = useState<User | undefined | null>();
+  // const [cartCount, setCartCount] = useState(0);
+  
   const {cartCount} = useCart();
 
   const onclickHandler = async () => {
@@ -205,12 +208,15 @@ export function Navbar() {
                       <NavigationMenuLink
                         asChild
                         className={navigationMenuTriggerStyle()}>
-                        <Link href="/courses">Training</Link>
+                        <Link href="/trainings">Trainings</Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink
                         asChild
                         className={navigationMenuTriggerStyle()}>
-                        <Link href="/courses">Workshops</Link>
+                          <div className="flex flex-col">
+                          <p className='text-[10px] text-primary '>Comming soon</p>
+                        <Link href="/courses" className="text-gray-400">Workshops</Link>
+                          </div>
                       </NavigationMenuLink>
                       <NavigationMenuLink
                         asChild

@@ -148,7 +148,7 @@ const Course = ({ params }: { params: { cid: string } }) => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col pt-24">
+    <div className="min-h-screen w-full flex flex-col pt-24 mx-6">
       <Dialog
         open={selectedSession}
         onOpenChange={() => setSelectedSession(null)}>
