@@ -35,6 +35,8 @@ const stripePromise = loadStripe(
 export default function CartPage() {
   // Mock cart data
   const [cartItems, setCartItems] = useState<any[]>([]);
+  console.log(cartItems);
+  
   const [clientSecret, setClientSecret] = React.useState("");
   const [paymentMethod, setPaymentMethod] = useState("contact");
   const [userId, setUserId] = useState<string>();

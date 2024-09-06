@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, use, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Home, FileText } from 'lucide-react'
@@ -14,7 +14,7 @@ interface OrderDetails {
   totalAmount: number
 }
 
-export default function SuccessPage() {
+function SuccessPageComponent() {
   const searchParams = useSearchParams()
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
   const [loading, setLoading] = useState(true)
@@ -23,8 +23,12 @@ export default function SuccessPage() {
   useEffect(() => {
     const updateDatabase = async () => {
       const paymentIntentId = searchParams.get('payment_intent')
-      const productId = searchParams.get('product_id')
+      // console.log(paymentIntentId);
+      
+      const productId = searchParams.get('product_ids')
+      // console.log(productId);
       const userId = searchParams.get('user_id')
+      // console.log(userId);
 
       if (!paymentIntentId || !productId || !userId) {
         setError('Missing required information')
@@ -39,26 +43,18 @@ export default function SuccessPage() {
           const res = await axios.patch(`/api/enrollments/${id}`, {
             paymentDone: true,
             bookingConfirmed: true,
-          });
+          })
           if (res.status === 200) {
-            console.log("Approved");
+            console.log("Approved")
             continue
-            // toast({ title: "Booking Approved", variant: "success" });
-            // setRefreshKey((oldKey) => oldKey + 1); // Update the refreshKey to trigger re-render
           }
         } catch (error) {
-          console.error("Error approving booking: ", error);
+          console.error("Error approving booking: ", error)
           setError('Error approving booking')
           break
-          // toast({ title: "Error approving booking", variant: "destructive" });
         }
       }
-        // setOrderDetails({
-        //   orderId: data.orderId,
-        //   date: new Date().toLocaleDateString(),
-        //   totalAmount: data.totalAmount,
-        // })
-        setLoading(false)
+      setLoading(false)
     }
 
     updateDatabase()
@@ -133,5 +129,13 @@ export default function SuccessPage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-screen"><p className="text-xl">Loading...</p></div>}>
+      <SuccessPageComponent />
+    </Suspense>
   )
 }

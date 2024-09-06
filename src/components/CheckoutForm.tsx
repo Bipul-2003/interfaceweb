@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 
 
 export default function CheckoutForm({ amount, cartItems, userId }: any) {
+  console.log(cartItems);
+  
   const stripe = useStripe();
   const elements = useElements();
 
@@ -113,7 +115,7 @@ export default function CheckoutForm({ amount, cartItems, userId }: any) {
       const result = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/return?product_ids=${cartItems.map((p:any) => p.id).join(',')}&user_id=${userId}`,
+          return_url: `${window.location.origin}/return?product_ids=${cartItems.map((p:any) => p._id).join(',')}&user_id=${userId}`,
         },
       })
 
