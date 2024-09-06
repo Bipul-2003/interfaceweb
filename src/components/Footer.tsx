@@ -3,7 +3,7 @@ import Link from "next/link"
 
 export default function Footer() {
   return (
-    <footer className="bg-muted py-4">
+    <footer className="bg-muted py-4 flex-grow flex ">
       {/* <div className="container max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
           <Link href="#" className="flex items-center gap-2" prefetch={false}>
@@ -55,7 +55,7 @@ export default function Footer() {
           </p>
         </div>
       </div> */}
-      <div className="container max-w-7xl mt-8 text-center text-sm text-muted-foreground">
+      <div className="container max-w-7xl my-4 text-center text-sm text-muted-foreground">
         &copy; 2024 Interface Hub, LLC. All rights reserved.
       </div>
     </footer>
