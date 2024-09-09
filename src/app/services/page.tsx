@@ -47,7 +47,7 @@ export default function ServicesPage() {
             />
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
             <p className="text-gray-600 relative z-10">
-              At Interface Hub, we understand the unique challenges small businesses face when it comes to technology. That's why we're committed to providing IT Application Support and Development services that are specifically designed to help small businesses streamline their operations, enhance productivity, and drive growth.
+              At Interface Hub, we understand the unique challenges small businesses face when it comes to technology. That&apos;s why we&apos;re committed to providing IT Application Support and Development services that are specifically designed to help small businesses streamline their operations, enhance productivity, and drive growth.
             </p>
             <p className="text-gray-600 mt-4 relative z-10">
               Our mission is simple: to make your business better through reliable, efficient, and affordable technology solutions.
