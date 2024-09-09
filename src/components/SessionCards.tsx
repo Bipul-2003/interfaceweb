@@ -34,10 +34,10 @@ import { LoadingSpinner } from "./ui/loader";
           <CardTitle className="text-xl">{`${new Date(
             session.startDate
           ).toLocaleDateString("en-us", {
-            month: "long",
+            month: "short",
             day: "numeric",
           })} - ${new Date(session.endDate).toLocaleDateString("en-us", {
-            month: "long",
+            month: "short",
             day: "numeric",
           })}`}</CardTitle>
           <p className="text-sm">

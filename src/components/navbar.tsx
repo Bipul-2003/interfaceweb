@@ -226,7 +226,7 @@ export function Navbar() {
                       <NavigationMenuLink
                         asChild
                         className={navigationMenuTriggerStyle()}>
-                        <Link href="/">Services</Link>
+                        <Link href="/services">Services</Link>
                       </NavigationMenuLink>
                     </ul>
                   </NavigationMenuContent>
@@ -263,13 +263,7 @@ export function Navbar() {
           </NavigationMenu>
         </section>
         <section className="flex gap-x-2 ">
-          <div className="hidden md:flex">
-            {user?.role === 1 ? (
-              <Button className="rounded-full" asChild>
-                <Link href="/admin/dashboard">Dashboard</Link>
-              </Button>
-            ) : null}
-          </div>
+          
           {user ? (
             <div className="flex items-center space-x-5">
              <Link href="/cart" className="relative">
