@@ -48,7 +48,7 @@ const Courses = () => {
       <p className="text-muted-foreground">
         Explore the courses to learn and grow.
       </p>
-      <div className="grid grid-cols-2 py-8 md:grid-cols-4 gap-8 mb-36">
+      <div className="grid grid-cols-2 py-8 md:grid-cols-3 gap-8 mb-36 px-4 max-w-screen-lg">
         {allcourses.courses.map((course: CourseType) => (
           <Card key={String(course._id)}>
             <img

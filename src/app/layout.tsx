@@ -5,6 +5,8 @@ import Layout from "@/components/Layout";
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from "@/context/cartCount";
 
+import 'react-quill/dist/quill.snow.css';  
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -27,6 +29,12 @@ export default function RootLayout({
           </Layout>
         </CartProvider>
       </body>
+{/* 
+      <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+      <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+      <script src="https://unpkg.com/react-quill@1.3.3/dist/react-quill.js"></script>
+      <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+      <script type="text/babel" src="/my-scripts.js"></script> */}
     </html>
   );
 }

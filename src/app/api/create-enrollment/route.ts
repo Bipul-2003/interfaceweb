@@ -44,8 +44,11 @@ export async function POST(req: Request) {
       );
     }
 
+    let enrollment;
+    let updatedSession;
+
     if (existingSession.enrolledStudents.length < existingSession.maxCapacity) {
-      const enrollment = new Enrollment({
+      enrollment = new Enrollment({
         user: user,
         session: session,
         status: "enrolled",
@@ -53,50 +56,18 @@ export async function POST(req: Request) {
       });
       await enrollment.save();
 
-      const updatedSession = await SessionModel.findByIdAndUpdate(
+      updatedSession = await SessionModel.findByIdAndUpdate(
         session,
         {
           $addToSet: { enrolledStudents: user },
         },
         { new: true }
       );
-      const cart = await CartModel.findOne({ user: user });
-      if (!cart) {
-        const newCart = new CartModel({
-          user: user,
-          product: [session],
-        });
-        await newCart.save();
-      } else {
-        const updatedCart = await CartModel.findOneAndUpdate(
-          { user: user },
-          {
-            $push: {
-              product: session,
-            },
-          },
-          { new: true }
-        );
-        if (!updatedCart) {
-          return Response.json(
-            { message: "Error updating cart" },
-            { status: 500 }
-          );
-        }
-      }
-
-      return Response.json(
-        {
-          message: "Added to the cart please pay..",
-          data: updatedSession,
-        },
-        { status: 200 }
-      );
     } else if (
       existingSession.waitingStudents.length <
       existingSession.maxWaitingCapacity
     ) {
-      const enrollment = new Enrollment({
+      enrollment = new Enrollment({
         user: user,
         session: session,
         status: "waiting",
@@ -104,21 +75,51 @@ export async function POST(req: Request) {
       });
       await enrollment.save();
 
-      const updatedSession = await SessionModel.findByIdAndUpdate(
+      updatedSession = await SessionModel.findByIdAndUpdate(
         session,
         {
           $addToSet: { waitingStudents: user },
         },
         { new: true }
       );
-
-      return Response.json(
-        { message: "You are in waitinglist", data: updatedSession },
-        { status: 200 }
-      );
     } else {
       return Response.json({ message: "Session is full" }, { status: 400 });
     }
+
+    // Update or create cart
+    const cartProduct = {
+      session: session,
+      enrollment: enrollment._id,
+    };
+
+    const updatedCart = await CartModel.findOneAndUpdate(
+      { user: user },
+      {
+        $push: { products: cartProduct },
+      },
+      { upsert: true, new: true }
+    );
+
+    if (!updatedCart) {
+      return Response.json(
+        { message: "Error updating cart" },
+        { status: 500 }
+      );
+    }
+
+    const message = enrollment.status === "enrolled"
+      ? "Added to the cart please pay.."
+      : "Added to cart & You are in waitinglist";
+
+    return Response.json(
+      {
+        message: message,
+        data: updatedSession,
+        cart: updatedCart,
+      },
+      { status: 200 }
+    );
+
   } catch (error) {
     console.error("Error creating enrollment:", error);
     return Response.json(

@@ -262,7 +262,7 @@ export default function SessionAdministrationPage() {
     // },
   });
   return (
-    <div className="pl-4">
+    <div className="pl-8">
       <h1 className="text-3xl font-bold pb-4">Sessions</h1>
 
       <Tabs defaultValue="manage">

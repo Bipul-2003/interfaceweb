@@ -142,7 +142,7 @@ export default function UsersAdministrationPage() {
   });
 
   return (
-    <div className="pl-4">
+    <div className="pl-8">
       <h1 className="text-3xl font-bold pb-4">Users</h1>
       <div className="">
         <div className="flex justify-end py-2">

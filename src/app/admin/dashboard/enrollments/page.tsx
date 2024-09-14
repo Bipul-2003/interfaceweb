@@ -246,7 +246,7 @@ export default function EnrollmentsAdministrationPage() {
   });
 
   return (
-    <div className="pl-4">
+    <div className="pl-8">
       <h1 className="text-3xl font-bold">Enrollments</h1>
       <div className="flex justify-end py-2">
         <Input

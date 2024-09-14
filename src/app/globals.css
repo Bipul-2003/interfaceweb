@@ -48,3 +48,33 @@
     --ring: 263.4 70% 50.4%;
   }
 }
+
+
+/* globals.css */
+
+.ql-editor {
+  @apply p-4 bg-white border border-gray-300 rounded-md shadow-sm;
+}
+
+.ql-toolbar {
+  @apply border border-gray-300 rounded-t-md;
+}
+
+.ql-container.ql-snow {
+  border: none;
+}
+
+.ql-editor ul,
+.ql-editor ol {
+  padding-left: 2rem;
+}
+
+.ql-editor h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.ql-editor h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}

@@ -139,7 +139,7 @@ export default function DashbordHome() {
     {
       id: "Course", // Custom ID for the column
       header: "Course",
-      accessorFn: (row) => row.session.course.title ?? "N/A", // Safely access nested properties
+      accessorFn: (row) => row.session.course?.title ?? "N/A", // Safely access nested properties
       cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
     },
     {

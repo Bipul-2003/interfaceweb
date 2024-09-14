@@ -20,6 +20,7 @@ import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import getSession from "@/utils/getSession";
 import axios from "axios";
 import { useCart } from "@/context/cartCount";
+import CartCard from "@/components/CartCard";
 // Define types
 // type CartItem = {
 //   id: number;
@@ -36,7 +37,7 @@ export default function CartPage() {
   // Mock cart data
   const [cartItems, setCartItems] = useState<any[]>([]);
   console.log(cartItems);
-  
+
   const [clientSecret, setClientSecret] = React.useState("");
   const [paymentMethod, setPaymentMethod] = useState("contact");
   const [userId, setUserId] = useState<string>();
@@ -58,25 +59,37 @@ export default function CartPage() {
 
   const fetchCart = async () => {
     const response = await axios.get("/api/getCart");
-    console.log(response.data.cartitems);
-    updateCart(response.data.cartitems.length);
-    setCartItems(response.data.cartitems);
+    console.log(response.data);
+    updateCart();
+    setCartItems(response.data);
   };
 
-  const removecart = async (id: number) => {
-    const response = await axios.patch("/api/getCart", {
-      sessionid: id,
-    });
-    console.log(response.data);
-    fetchCart();
+  const removecart = async (id: number, enrollmentid:number) => {
+    console.log(id, enrollmentid);
+    
+    try {
+      const response = await axios.patch("/api/getCart", {
+        sessionid: id,
+      });
+      console.log(response);
+
+      const res = await axios.get(`/api/admin/reject-enrollment/${enrollmentid}`);
+      if (res.status === 200) {
+        console.log("Rejected");
+      }
+
+      await fetchCart();
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
   useEffect(() => {
-    const fetchCart = async () => {
-      const response = await axios.get("/api/getCart");
-      console.log(response.data.cartitems);
-      updateCart(response.data.cartitems.length);
-      setCartItems(response.data.cartitems);
-    };
+    // const fetchCart = async () => {
+    //   const response = await axios.get("/api/getCart");
+    //   console.log(response.data.cartitems);
+    //   updateCart(response.data.cartitems.length);
+    //   setCartItems(response.data.cartitems);
+    // };
     fetchCart();
   }, []);
 
@@ -103,25 +116,23 @@ export default function CartPage() {
   }, [cartItems, userId]);
 
   // Calculate total cart value
-  const total = cartItems.reduce(
-    (sum, item) => sum + Number(item.session.price),
-    0
-  );
+  const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
 
   // Update quantity
-  const updateQuantity = (id: number, newQuantity: number) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(0, newQuantity) } : item
-      )
-    );
-  };
+  // const updateQuantity = (id: number, newQuantity: number) => {
+  //   setCartItems(
+  //     cartItems.map((item) =>
+  //       item.id === id ? { ...item, quantity: Math.max(0, newQuantity) } : item
+  //     )
+  //   );
+  // };
 
   // Remove item from cart
-  const removeItem = (id: number) => {
+  const removeItem = (id: number,enrollmentid:number) => {
+    console.log(id, enrollmentid);
     setCartItems(cartItems.filter((item) => item.id !== id));
     removeFromCart();
-    removecart(id);
+    removecart(id, enrollmentid);
   };
 
   // Mock function for payment processing
@@ -150,62 +161,79 @@ export default function CartPage() {
         <>
           <div className="space-y-4">
             {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
-                {/* <Image 
-                  src={item.image}
-                  alt={item.name}
-                  width={80}
-                  height={80}
-                  className="rounded-md"
-                />
-                */}
+              // <div
+              //   key={item.id}
+              //   className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
+              //   {/* <Image 
+              //     src={item.image}
+              //     alt={item.name}
+              //     width={80}
+              //     height={80}
+              //     className="rounded-md"
+              //   />
+              //   */}
 
-                <div className="flex-grow">
-                  <div className="flex space-x-4">
-                    <h2 className="font-semibold">
-                      {item.session.course.title}
-                    </h2>
-                    <p className="text-gray-600 text-xs md:text-base">
-                      session: {item.session.sessionno}
-                    </p>
-                  </div>
-                </div>
-                {/* <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
-                    aria-label="Decrease quantity">
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
-                    aria-label="Increase quantity">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div> */}
+              //   <div className="flex-grow">
+              //     <div className="flex space-x-4">
+              //       <h2 className="font-semibold">{item.course.title}</h2>
+              //       <p className="text-gray-600 text-xs md:text-base">
+              //         session: {item.sessionno}
+              //       </p>
+              //       <p className="">{item.status}</p>
+              //     </div>
+              //   </div>
+              //   {/* <div className="flex items-center space-x-2">
+              //     <button
+              //       onClick={() => updateQuantity(item.id, item.quantity - 1)}
+              //       className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
+              //       aria-label="Decrease quantity">
+              //       <Minus className="w-4 h-4" />
+              //     </button>
+              //     <span>{item.quantity}</span>
+              //     <button
+              //       onClick={() => updateQuantity(item.id, item.quantity + 1)}
+              //       className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
+              //       aria-label="Increase quantity">
+              //       <Plus className="w-4 h-4" />
+              //     </button>
+              //   </div> */}
 
-                <p className="text-muted-foreground text-xs md:text-base">
-                  Due:{" "}
-                  {new Intl.DateTimeFormat("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                  }).format(new Date(item.session.paymentLastDate as string))}
-                </p>
-                <p className="font-semibold text-xs md:text-base">$ {item.session.price}</p>
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="p-1 rounded-full bg-red-100 text-red-500 hover:bg-red-200"
-                  aria-label="Remove item">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              //   <p className="text-muted-foreground text-xs md:text-base">
+              //     Due:{" "}
+              //     {new Intl.DateTimeFormat("en-US", {
+              //       month: "short",
+              //       day: "numeric",
+              //       year: "numeric",
+              //       hour: "numeric",
+              //       minute: "numeric",
+              //     }).format(new Date(item.paymentLastDate as string))}
+              //   </p>
+              //   <p className="font-semibold text-xs md:text-base">
+              //     $ {item.price}
+              //   </p>
+              //   <button
+              //     onClick={() => removeItem(item.sessionId, item.enrollmentId)}
+              //     className="p-1 rounded-full bg-red-100 text-red-500 hover:bg-red-200"
+              //     aria-label="Remove item">
+              //     <X className="w-4 h-4" />
+              //   </button>
+              // </div>
+
+              <CartCard 
+                key={item.sessionId} 
+                title={item.course.title} 
+                sessionNo={item.sessionno} 
+                startDate={item.session.startDate} 
+                endDate={item.session.endDate} 
+                timing={item.session.startTime + " - " + item.session.endTime} 
+                instructor={item.session.instructor} 
+                days={item.session.days} 
+                status={item.status}
+                // bookingDueDate={item.bookingDueDate} 
+                paymentDueDate={item.paymentLastDate} 
+                price={item.price} 
+                onRemove={() => removeItem(item.sessionId, item.enrollmentId)}
+              />
             ))}
           </div>
           <div className="mt-8 flex justify-between items-center px-6">

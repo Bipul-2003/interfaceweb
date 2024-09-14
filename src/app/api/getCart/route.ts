@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnection";
 import CartModel from "@/models/Cart";
-import Enrollment from "@/models/Enrollments";
 import getSession from "@/utils/getSession";
 import mongoose from "mongoose";
 
@@ -11,70 +10,86 @@ export async function GET() {
     const session = await getSession();
     if (!session) {
       return Response.json(
-        { message: "Unauthorized Please login" },
+        { message: "Unauthorized. Please login." },
         { status: 401 }
       );
     }
+
     const user = session.user;
-    const cartitems = await CartModel.aggregate([
+
+    // Fetch cart items and their associated sessions
+    const cartItems = await CartModel.aggregate([
       {
         $match: {
           user: new mongoose.Types.ObjectId(user?.id),
         },
       },
       {
+        $unwind: "$products",
+      },
+      {
         $lookup: {
           from: "sessions",
-          localField: "product",
+          localField: "products.session",
           foreignField: "_id",
-          as: "session",
-          pipeline: [
-            {
-              $lookup: {
-                from: "courses",
-                localField: "courseid",
-                foreignField: "_id",
-                as: "course",
-                pipeline: [
-                  {
-                    $project: {
-                      title: 1,
-                      _id: 0,
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              $addFields: {
-                course: {
-                  $first: "$course",
-                },
-              },
-            },
-            {
-              $project: {
-                course: 1,
-                _id: 0,
-                paymentLastDate: 1,
-                startDate: 1,
-                instructor: 1,
-                sessionno:1,
-                price: 1,
-              },
-            },
-          ],
+          as: "sessionData",
         },
       },
       {
-        $addFields: {
+        $unwind: "$sessionData",
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "sessionData.courseid",
+          foreignField: "_id",
+          as: "courseData",
+        },
+      },
+      {
+        $unwind: "$courseData",
+      },
+      {
+        $lookup: {
+          from: "enrollments",
+          localField: "products.enrollment",
+          foreignField: "_id",
+          as: "enrollmentData",
+        }
+      },
+      {
+        $unwind: "$enrollmentData",
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$enrollmentData.status",
+          enrollmentId: "$products.enrollment",
+          sessionId: "$sessionData._id",
           session: {
-            $first: "$session",
+            enrolledStudentsCount: { $size: "$sessionData.enrolledStudents" },
+            maxcapacity: "$sessionData.maxcapacity",
+            startDate: "$sessionData.startDate",
+            endDate: "$sessionData.endDate",
+            instructor: "$sessionData.instructor",
+            startTime: "$sessionData.startTime",
+            endTime: "$sessionData.endTime",
+            days: "$sessionData.days",
           },
+          course: {
+            title: "$courseData.title",
+          },
+          paymentLastDate: "$sessionData.paymentLastDate",
+          startDate: "$sessionData.startDate",
+          instructor: "$sessionData.instructor",
+          sessionno: "$sessionData.sessionno",
+          price: "$sessionData.price",
         },
       },
     ]);
-    return Response.json({ cartitems });
+
+    // Return the array of sessions with enrollment IDs
+    return Response.json(cartItems, { status: 200 });
   } catch (error) {
     console.error("Error fetching cart:", error);
     return Response.json({ message: "Error fetching cart" }, { status: 500 });
@@ -84,33 +99,37 @@ export async function GET() {
 export async function PATCH(request: Request) {
   await dbConnect();
   const { sessionid } = await request.json();
+  console.log(sessionid);
+
   try {
     const session = await getSession();
     if (!session) {
       return Response.json(
-        { message: "Unauthorized Please login" },
+        { message: "Unauthorized. Please login." },
         { status: 401 }
       );
     }
+
     const user = session.user;
+
+    // Remove the specific session ID from the 'product' array
     const updatedCart = await CartModel.findOneAndUpdate(
       { user: user?.id },
-      { $pull: { items: { product: sessionid } } },
+      { $pull: { products: { session: sessionid } } },
       { new: true }
     );
 
     if (!updatedCart) {
       return Response.json({ message: "Error updating cart" }, { status: 500 });
     }
-    Response.json({ message: "Product removed from cart" }, { status: 200 });
-  } catch (error) {
-    console.error("Error creating enrollment:", error);
+
     return Response.json(
-      { message: "Error creating enrollment" },
-      { status: 500 }
+      { message: "Session removed from cart", cart: updatedCart },
+      { status: 200 }
     );
+  } catch (error) {
+    console.error("Error updating cart:", error);
+    return Response.json({ message: "Error updating cart" }, { status: 500 });
   }
 }
-
-
-export const dynamic  = "force-dynamic";
+export const dynamic = "force-dynamic";

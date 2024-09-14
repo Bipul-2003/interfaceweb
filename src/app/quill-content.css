@@ -1,0 +1,11 @@
+/* quill-content.css */
+.quill-content .ql-indent-1 {
+    padding-left: 3em;
+  }
+  
+  .quill-content .ql-indent-2 {
+    padding-left: 6em;
+  }
+  
+  /* Add more styles as needed */
+  

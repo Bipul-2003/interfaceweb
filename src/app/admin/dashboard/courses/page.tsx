@@ -32,8 +32,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Button } from "@/components/ui/button";
+import "react-quill/dist/quill.snow.css";
 
+import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import { toast } from "@/components/ui/use-toast";
 import { createCourseSchema } from "@/Schemas/createCourseSchema";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,6 +50,23 @@ export default function CoursesAdministrationPage() {
   const fetchData = async (limit: number = 20) => {
     const coursesResponse = await axios.get("/api/courses");
     setCourses(coursesResponse.data.courses);
+  };
+
+  const modules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }], // Indent options
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ color: [] }, { background: [] }], // Text color and background color
+      [{ align: [] }],
+      [
+        "link",
+        // 'image',
+        //  'video'
+      ],
+      ["clean"], // Remove formatting button
+    ],
   };
 
   useEffect(() => {
@@ -122,7 +143,7 @@ export default function CoursesAdministrationPage() {
     // },
   });
   return (
-    <div className="pl-4">
+    <div className="pl-8">
       <h1 className="text-3xl font-bold pb-4">Courses</h1>
 
       <Tabs defaultValue="manage">
@@ -243,7 +264,14 @@ export default function CoursesAdministrationPage() {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         {/* <Textarea {...field} className="h-36" /> */}
-                        <TiptapEditor content={field.value} onChange={field.onChange} />
+                        {/* <TiptapEditor content={field.value} onChange={field.onChange} /> */}
+                        <ReactQuill
+                          value={field.value}
+                          onChange={field.onChange}
+                          className="h-full"
+                          theme="snow"
+                          modules={modules}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -253,7 +281,7 @@ export default function CoursesAdministrationPage() {
                 <Button
                   disabled={creatingCourse}
                   type="submit"
-                  className="min-w-full">
+                  className="min-w-full mt-20">
                   Create Course
                 </Button>
               </form>
