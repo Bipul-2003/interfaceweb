@@ -54,14 +54,14 @@ export default function CoursesAdministrationPage() {
 
   const modules = {
     toolbar: [
-      [{ font: [] }],
+      // [{ font: [] }],
       [{ list: "ordered" }, { list: "bullet" }],
-      [{ indent: "-1" }, { indent: "+1" }], // Indent options
+      // [{ indent: "-1" }, { indent: "+1" }], // Indent options
       ["bold", "italic", "underline", "strike", "blockquote"],
-      [{ color: [] }, { background: [] }], // Text color and background color
-      [{ align: [] }],
+      // [{ color: [] }, { background: [] }], // Text color and background color
+      // [{ align: [] }],
       [
-        "link",
+        // "link",
         // 'image',
         //  'video'
       ],
@@ -268,7 +268,7 @@ export default function CoursesAdministrationPage() {
                         <ReactQuill
                           value={field.value}
                           onChange={field.onChange}
-                          className="h-full"
+                          className="h-64 pb-6"
                           theme="snow"
                           modules={modules}
                         />
