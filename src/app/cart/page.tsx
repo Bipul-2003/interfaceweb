@@ -301,7 +301,7 @@ export default function CartPage() {
                       cartItems={cartItems}
                       userId={userId}
                     />
-                  </Elements>
+                  </Elements> 
                 </div>
               )}
             </DialogContent>

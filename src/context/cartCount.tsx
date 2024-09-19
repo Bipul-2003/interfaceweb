@@ -7,7 +7,6 @@ import React, {
   useContext,
   useState,
   ReactNode,
-  use,
   useEffect,
 } from "react";
 
@@ -27,21 +26,24 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
   const fetchCart = async () => {
     const response = await axios.get("/api/getCart");
-    // console.log(response.data.cartitems);
     setCartCount(response.data.length);
-    // setCartCount(response.data.cartitems);
+  };
+
+  const fetchUser = async () => {
+    const session = await getSession();
+    setUser(session?.user);
+    console.log(session?.user || null);
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const session = await getSession();
-      setUser(session?.user || null);
-    };
     fetchUser();
+  }, []); 
+
+  useEffect(() => {
     if (user) {
       fetchCart();
     }
-  }, []);
+  }, [user]);
 
   const updateCart = async () => await fetchCart();
   const removeFromCart = () =>

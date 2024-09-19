@@ -42,10 +42,20 @@ import { toast } from "@/components/ui/use-toast";
 import { createCourseSchema } from "@/Schemas/createCourseSchema";
 import { Textarea } from "@/components/ui/textarea";
 import { TiptapEditor } from "@/components/TextEditor";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Pencil } from "lucide-react";
 
 export default function CoursesAdministrationPage() {
   const [courses, setCourses] = useState<[]>([]);
   const [creatingCourse, setcreatingCourse] = useState<boolean>(false);
+  const [editingCourse, setEditingCourse] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fetchData = async (limit: number = 20) => {
     const coursesResponse = await axios.get("/api/courses");
@@ -54,17 +64,8 @@ export default function CoursesAdministrationPage() {
 
   const modules = {
     toolbar: [
-      // [{ font: [] }],
       [{ list: "ordered" }, { list: "bullet" }],
-      // [{ indent: "-1" }, { indent: "+1" }], // Indent options
       ["bold", "italic", "underline", "strike", "blockquote"],
-      // [{ color: [] }, { background: [] }], // Text color and background color
-      // [{ align: [] }],
-      [
-        // "link",
-        // 'image',
-        //  'video'
-      ],
       ["clean"], // Remove formatting button
     ],
   };
@@ -78,6 +79,15 @@ export default function CoursesAdministrationPage() {
   }, []);
 
   const form = useForm<z.infer<typeof createCourseSchema>>({
+    resolver: zodResolver(createCourseSchema),
+    defaultValues: {
+      title: "",
+      courseContent: "",
+      duration: 0,
+    },
+  });
+
+  const editForm = useForm<z.infer<typeof createCourseSchema>>({
     resolver: zodResolver(createCourseSchema),
     defaultValues: {
       title: "",
@@ -105,24 +115,64 @@ export default function CoursesAdministrationPage() {
     }
   };
 
+  const onEditSubmit = async (data: z.infer<typeof createCourseSchema>) => {
+
+    try {
+      const response = await axios.put(`/api/admin/edit-course/${editingCourse._id}`, data);
+
+      if (response.status === 200) {
+        toast({ title: "Course updated successfully", variant: "success" });
+        fetchData();
+        setEditingCourse(null);
+        setIsDialogOpen(false);
+      }
+    } catch (error) {
+      console.log(error);
+      toast({ title: "Error updating course", variant: "destructive" });
+    }
+    // console.log(data)
+    // console.log(editingCourse)
+  };
+
   const columns: ColumnDef<any>[] = [
     {
-      id: "title", // Custom ID for the column
+      id: "title",
       header: "Title",
-      accessorFn: (row) => row.title ?? "N/A", // Safely access nested properties
-      cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
+      accessorFn: (row) => row.title ?? "N/A",
+      cell: ({ getValue }) => getValue() || "No title",
     },
     {
-      id: "duration", // Custom ID for the column
+      id: "duration",
       header: "Duration (hours)",
-      accessorFn: (row) => row.duration ?? "N/A", // Safely access nested properties
+      accessorFn: (row) => row.duration ?? "N/A",
       cell: ({ getValue }) => {
         const no = getValue();
         return new Intl.NumberFormat("en-US", {
           minimumIntegerDigits: 2,
           useGrouping: false,
         }).format(no as number);
-      }, // Display the value or a default text
+      },
+    },
+    {
+      id: "edit",
+      // header: "Edit",
+      cell: ({ row }) => (
+        <Button
+          variant="outline"
+          className=' bg-transparent'
+          onClick={() => {
+            setEditingCourse(row.original);
+            editForm.reset({
+              title: row.original.title,
+              courseContent: row.original.courseContent,
+              duration: row.original.duration,
+            });
+            setIsDialogOpen(true);
+          }}
+        >
+          <Pencil className='size-4'/>
+        </Button>
+      ),
     },
   ];
 
@@ -130,18 +180,9 @@ export default function CoursesAdministrationPage() {
     data: courses,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
-    // onSortingChange: setSorting,
-    // onColumnFiltersChange: setColumnFilters,
-    // getPaginationRowModel: getPaginationRowModel(),
-    // getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // onRowSelectionChange: setRowSelection,
-    // state: {
-    //   sorting,
-    //   columnFilters,
-    //   rowSelection,
-    // },
   });
+
   return (
     <div className="pl-8">
       <h1 className="text-3xl font-bold pb-4">Courses</h1>
@@ -153,12 +194,10 @@ export default function CoursesAdministrationPage() {
         </TabsList>
         <TabsContent value="manage">
           <div className="">
-            <div className="flex justify-end py-2">
+            <div className="flex justify-end ">
               <Input
                 placeholder="Filter course..."
-                value={
-                  (table.getColumn("title")?.getFilterValue() as string) ?? ""
-                }
+                value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
                 onChange={(event) =>
                   table.getColumn("title")?.setFilterValue(event.target.value)
                 }
@@ -189,7 +228,8 @@ export default function CoursesAdministrationPage() {
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getIsSelected() && "selected"}>
+                      data-state={row.getIsSelected() && "selected"}
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
                           {flexRender(
@@ -204,7 +244,8 @@ export default function CoursesAdministrationPage() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center">
+                      className="h-24 text-center"
+                    >
                       No results.
                     </TableCell>
                   </TableRow>
@@ -218,14 +259,14 @@ export default function CoursesAdministrationPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex-col space-y-6 md:ml-36 max-w-2xl">
+                className="flex-col space-y-6 md:ml-36 max-w-2xl"
+              >
                 <FormField
                   name="title"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Title</FormLabel>
-
                       <Input {...field} />
                       <FormMessage />
                     </FormItem>
@@ -243,9 +284,7 @@ export default function CoursesAdministrationPage() {
                           type="number"
                           onChange={(e) =>
                             field.onChange(
-                              e.target.value === ""
-                                ? ""
-                                : Number(e.target.value)
+                              e.target.value === "" ? "" : Number(e.target.value)
                             )
                           }
                         />
@@ -255,7 +294,6 @@ export default function CoursesAdministrationPage() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   name="courseContent"
                   control={form.control}
@@ -263,8 +301,6 @@ export default function CoursesAdministrationPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        {/* <Textarea {...field} className="h-36" /> */}
-                        {/* <TiptapEditor content={field.value} onChange={field.onChange} /> */}
                         <ReactQuill
                           value={field.value}
                           onChange={field.onChange}
@@ -277,11 +313,11 @@ export default function CoursesAdministrationPage() {
                     </FormItem>
                   )}
                 />
-
                 <Button
                   disabled={creatingCourse}
                   type="submit"
-                  className="min-w-full mt-20">
+                  className="min-w-full mt-20"
+                >
                   Create Course
                 </Button>
               </form>
@@ -289,6 +325,73 @@ export default function CoursesAdministrationPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[900px]">
+          <DialogHeader>
+            <DialogTitle>Edit Course</DialogTitle>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+              <FormField
+                name="title"
+                control={editForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="duration"
+                control={editForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>Duration in hours</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="courseContent"
+                control={editForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <ReactQuill
+                        value={field.value}
+                        onChange={field.onChange}
+                        className="h-64 pb-10"
+                        theme="snow"
+                        modules={modules}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Save Changes</Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

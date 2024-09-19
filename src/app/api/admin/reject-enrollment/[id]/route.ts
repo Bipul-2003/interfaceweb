@@ -73,6 +73,9 @@ export async function GET(
       );
     }
 
+    console.log(nextStudent);
+    
+
     if (nextStudent) {
       const updateNextStudentEnrollment =
         await EnrollmentModel.findOneAndUpdate(
