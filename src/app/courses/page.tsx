@@ -14,6 +14,7 @@ import {
 import { Clock2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface CoursesResponse {
   courses: CourseType[];
@@ -51,7 +52,7 @@ const Courses = () => {
       <div className="grid grid-cols-2 py-8 md:grid-cols-3 gap-8 mb-36 px-4 max-w-screen-lg">
         {allcourses.courses.map((course: CourseType) => (
           <Card key={String(course._id)}>
-            <img
+            <Image
               src="/learning.svg"
               alt="Course Image"
               className="rounded-t-lg object-fit object-left w-full aspect-[8/2] bg-muted"

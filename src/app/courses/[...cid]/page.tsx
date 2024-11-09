@@ -26,6 +26,7 @@ const SessionCards = dynamic(() => import("@/components/SessionCards"));
 
 // Lazy load React Quill styles
 import"react-quill/dist/quill.snow.css";
+import CourseContentRenderer from "@/components/CourseContentRenderer";
 
 const fetchCourseData = async (id: string) => {
   const [sessionsResponse, courseResponse] = await Promise.all([
@@ -149,7 +150,9 @@ const Course = ({ params }: { params: { cid: string } }) => {
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
         </TabsList>
         <TabsContent value="content" className="p-2 max-w-screen-md">
-          <div className="prose mt-2 quill-content" dangerouslySetInnerHTML={{ __html: state.course.courseContent }} />
+          <CourseContentRenderer content={state.course.courseContent} />
+
+          {/* <div className="prose mt-2 quill-content" dangerouslySetInnerHTML={{ __html: state.course.courseContent }} /> */}
         </TabsContent>
         <TabsContent value="sessions" className="p-2 max-w-screen-lg">
           <div className="grid md:grid-cols-4 gap-2">

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building, CheckCircle, TrendingUp, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -106,7 +107,7 @@ export default function Trainings() {
                 </li>
               </ul>
             </div>
-            <img
+            <Image
               src="/success.png"
               width={650}
               height={500}

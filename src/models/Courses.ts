@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document, Types, Model } from "mongoose";
+import SessionModel from "./Sessions";
 
 export interface CourseType extends Document {
   title: string;
@@ -6,7 +7,7 @@ export interface CourseType extends Document {
   duration: number;
 }
 
-const CourseSchema: Schema<CourseType> = new Schema(
+const CourseSchema = new Schema<CourseType>(
   {
     title: {
       type: String,
@@ -25,8 +26,17 @@ const CourseSchema: Schema<CourseType> = new Schema(
   { timestamps: true }
 );
 
-const CourseModel =
-  (mongoose.models.Course as mongoose.Model<CourseType>) ||
-  mongoose.model<CourseType>("Course", CourseSchema);
+// Add pre-remove hook
+CourseSchema.pre('findOneAndDelete', async function(this: any, next) {
+  try {
+    const courseId = this.getQuery()["_id"];
+    await SessionModel.deleteMany({ courseid: courseId });
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+const CourseModel: Model<CourseType> = mongoose.models.Course as Model<CourseType> || mongoose.model<CourseType>("Course", CourseSchema);
 
 export default CourseModel;

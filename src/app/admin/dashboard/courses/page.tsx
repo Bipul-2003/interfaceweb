@@ -37,19 +37,26 @@ import "react-quill/dist/quill.snow.css";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
+
+// import ReactQuill from 'react-quill'; // Import React Quill
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import { toast } from "@/components/ui/use-toast";
 import { createCourseSchema } from "@/Schemas/createCourseSchema";
-import { Textarea } from "@/components/ui/textarea";
-import { TiptapEditor } from "@/components/TextEditor";
+// import { Textarea } from "@/components/ui/textarea";
+// import { TiptapEditor } from "@/components/TextEditor";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger,
 } from "@/components/ui/dialog";
 import { Pencil } from "lucide-react";
+
+// Define fonts and sizes you want to allow
+const Font = {
+  whitelist: ['arial', 'comic-sans', 'roboto', 'times-new-roman', 'calibri'],
+};
 
 export default function CoursesAdministrationPage() {
   const [courses, setCourses] = useState<[]>([]);
@@ -57,16 +64,38 @@ export default function CoursesAdministrationPage() {
   const [editingCourse, setEditingCourse] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  
+
   const fetchData = async (limit: number = 20) => {
     const coursesResponse = await axios.get("/api/courses");
     setCourses(coursesResponse.data.courses);
   };
 
+  // const modules = {
+  //   toolbar: [
+  //     [{ list: "ordered" }, { list: "bullet" }],
+  //     ["bold", "italic", "underline", "strike", "blockquote"],
+  //     ["clean"], // Remove formatting button
+  //   ],
+  // };
+
+
   const modules = {
     toolbar: [
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      ["clean"], // Remove formatting button
+      [{ 'font': Font.whitelist }], // Add font options here
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // Header options
+      [{ 'align': [] }], // Text alignment
+      ['bold', 'italic', 'underline', 'strike'], // Formatting options
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }], // List options
+      [{ 'script': 'sub' }, { 'script': 'super' }], // Subscript and superscript
+      [{ 'indent': '-1' }, { 'indent': '+1' }], // Indentation
+      // [{ 'direction': 'rtl' }], // Text direction
+      [{ 'color': [] }, { 'background': [] }], // Color and background
+      ['link'], // Link, image, video
+      // ['link', 'image', 'video'], // Link, image, video
+      ['clean'], // Remove formatting button
+      ['blockquote'], // Blockquote and code block
+      // ['blockquote', 'code-block'], // Blockquote and code block
     ],
   };
 
@@ -304,7 +333,7 @@ export default function CoursesAdministrationPage() {
                         <ReactQuill
                           value={field.value}
                           onChange={field.onChange}
-                          className="h-64 pb-6"
+                          // className="h-64 pb-6"
                           theme="snow"
                           modules={modules}
                         />
@@ -375,19 +404,21 @@ export default function CoursesAdministrationPage() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
+                      <div className="relative">
                       <ReactQuill
                         value={field.value}
                         onChange={field.onChange}
-                        className="h-64 pb-10"
+                        // className="absolute"
                         theme="snow"
                         modules={modules}
                       />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" className="pt-4">Save Changes</Button>
             </form>
           </Form>
         </DialogContent>
