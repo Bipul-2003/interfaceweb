@@ -1,5 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { CircleUser } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,25 +13,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { MouseEventHandler } from "react";
-import { DialogClose } from "./ui/dialog";
-import { CircleUser } from "lucide-react";
+} from '@/components/ui/dropdown-menu'
 
 export function UserNav({
   logout,
   user,
 }: {
-  logout: MouseEventHandler;
-  user: any;
+  logout: () => void
+  user: { username: string }
 }) {
+  const [open, setOpen] = useState(false)
+
+  const handleSelect = (callback?: () => void) => {
+    setOpen(false)
+    if (callback) {
+      callback()
+    }
+  }
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            {/* <AvatarImage src="/avatars/01.png" alt="@shadcn" /> */}
             <AvatarFallback>
               <CircleUser />
             </AvatarFallback>
@@ -39,30 +48,29 @@ export function UserNav({
             <p className="text-sm font-medium leading-none text-muted-foreground">
               {user.username}
             </p>
-            {/* <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
-            </p> */}
           </div>
-          <DropdownMenuSeparator />
-          
         </DropdownMenuLabel>
-        <DropdownMenuItem className="ml-0">
-            <Link href={"/admin/dashboard"}>Dashboard</Link>
-          </DropdownMenuItem>
-        {/* <DropdownMenuSeparator /> */}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/admin/dashboard" onClick={() => handleSelect()}>
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={"/user/profile"}>Profile</Link>
+            <Link href="/user/profile" onClick={() => handleSelect()}>
+              Profile
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="bg-red-200 cursor-pointer"
-          onClick={logout}>
+          onSelect={() => handleSelect(logout)}
+        >
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

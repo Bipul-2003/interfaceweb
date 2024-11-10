@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs"
+import axios from "axios"
+import React, { useEffect, useState } from "react"
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from "@tanstack/react-table"
 import {
   Table,
   TableBody,
@@ -17,11 +17,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+} from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import {
   Form,
   FormControl,
@@ -30,82 +30,65 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form"
 
-import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css"
 
-import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button"
+import dynamic from "next/dynamic"
 
-
-// import ReactQuill from 'react-quill'; // Import React Quill
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-import { toast } from "@/components/ui/use-toast";
-import { createCourseSchema } from "@/Schemas/createCourseSchema";
-// import { Textarea } from "@/components/ui/textarea";
-// import { TiptapEditor } from "@/components/TextEditor";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
+import { toast } from "@/components/ui/use-toast"
+import { createCourseSchema } from "@/Schemas/createCourseSchema"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  // DialogTrigger,
-} from "@/components/ui/dialog";
-import { Pencil } from "lucide-react";
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Pencil, Trash2 } from "lucide-react"
 
-// Define fonts and sizes you want to allow
 const Font = {
   whitelist: ['arial', 'comic-sans', 'roboto', 'times-new-roman', 'calibri'],
-};
+}
 
 export default function CoursesAdministrationPage() {
-  const [courses, setCourses] = useState<[]>([]);
-  const [creatingCourse, setcreatingCourse] = useState<boolean>(false);
-  const [editingCourse, setEditingCourse] = useState<any>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  
+  const [courses, setCourses] = useState<[]>([])
+  const [creatingCourse, setCreatingCourse] = useState<boolean>(false)
+  const [editingCourse, setEditingCourse] = useState<any>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [courseToDelete, setCourseToDelete] = useState<any>(null)
 
   const fetchData = async (limit: number = 20) => {
-    const coursesResponse = await axios.get("/api/courses");
-    setCourses(coursesResponse.data.courses);
-  };
-
-  // const modules = {
-  //   toolbar: [
-  //     [{ list: "ordered" }, { list: "bullet" }],
-  //     ["bold", "italic", "underline", "strike", "blockquote"],
-  //     ["clean"], // Remove formatting button
-  //   ],
-  // };
-
+    const coursesResponse = await axios.get("/api/courses")
+    setCourses(coursesResponse.data.courses)
+  }
 
   const modules = {
     toolbar: [
-      [{ 'font': Font.whitelist }], // Add font options here
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // Header options
-      [{ 'align': [] }], // Text alignment
-      ['bold', 'italic', 'underline', 'strike'], // Formatting options
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }], // List options
-      [{ 'script': 'sub' }, { 'script': 'super' }], // Subscript and superscript
-      [{ 'indent': '-1' }, { 'indent': '+1' }], // Indentation
-      // [{ 'direction': 'rtl' }], // Text direction
-      [{ 'color': [] }, { 'background': [] }], // Color and background
-      ['link'], // Link, image, video
-      // ['link', 'image', 'video'], // Link, image, video
-      ['clean'], // Remove formatting button
-      ['blockquote'], // Blockquote and code block
-      // ['blockquote', 'code-block'], // Blockquote and code block
+      [{ 'font': Font.whitelist }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'align': [] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link'],
+      ['clean'],
+      ['blockquote'],
     ],
-  };
+  }
 
   useEffect(() => {
     try {
-      fetchData();
+      fetchData()
     } catch (error) {
-      console.error("Error fetching courses: ", error);
+      console.error("Error fetching courses: ", error)
     }
-  }, []);
+  }, [])
 
   const form = useForm<z.infer<typeof createCourseSchema>>({
     resolver: zodResolver(createCourseSchema),
@@ -114,7 +97,7 @@ export default function CoursesAdministrationPage() {
       courseContent: "",
       duration: 0,
     },
-  });
+  })
 
   const editForm = useForm<z.infer<typeof createCourseSchema>>({
     resolver: zodResolver(createCourseSchema),
@@ -123,45 +106,56 @@ export default function CoursesAdministrationPage() {
       courseContent: "",
       duration: 0,
     },
-  });
+  })
 
   const onSubmit = async (data: z.infer<typeof createCourseSchema>) => {
-    console.log(data);
-    setcreatingCourse(true);
+    setCreatingCourse(true)
 
     try {
-      const response = await axios.post("/api/create-course", data);
+      const response = await axios.post("/api/create-course", data)
 
       if (response.status === 201) {
-        toast({ title: "Course created successfully", variant: "success" });
-        fetchData();
+        toast({ title: "Course created successfully", variant: "success" })
+        fetchData()
       }
     } catch (error) {
-      console.log(error);
-      toast({ title: "Error creating course", variant: "destructive" });
+      console.log(error)
+      toast({ title: "Error creating course", variant: "destructive" })
     } finally {
-      setcreatingCourse(false);
+      setCreatingCourse(false)
     }
-  };
+  }
 
   const onEditSubmit = async (data: z.infer<typeof createCourseSchema>) => {
-
     try {
-      const response = await axios.put(`/api/admin/edit-course/${editingCourse._id}`, data);
+      const response = await axios.put(`/api/admin/edit-course/${editingCourse._id}`, data)
 
       if (response.status === 200) {
-        toast({ title: "Course updated successfully", variant: "success" });
-        fetchData();
-        setEditingCourse(null);
-        setIsDialogOpen(false);
+        toast({ title: "Course updated successfully", variant: "success" })
+        fetchData()
+        setEditingCourse(null)
+        setIsDialogOpen(false)
       }
     } catch (error) {
-      console.log(error);
-      toast({ title: "Error updating course", variant: "destructive" });
+      console.log(error)
+      toast({ title: "Error updating course", variant: "destructive" })
     }
-    // console.log(data)
-    // console.log(editingCourse)
-  };
+  }
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(`/api/admin/delete-course/${courseToDelete._id}`)
+
+      if (response.status === 200) {
+        toast({ title: "Course deleted successfully", variant: "success" })
+        fetchData()
+        setIsDeleteDialogOpen(false)
+      }
+    } catch (error) {
+      console.log(error)
+      toast({ title: "Error deleting course", variant: "destructive" })
+    }
+  }
 
   const columns: ColumnDef<any>[] = [
     {
@@ -175,42 +169,54 @@ export default function CoursesAdministrationPage() {
       header: "Duration (hours)",
       accessorFn: (row) => row.duration ?? "N/A",
       cell: ({ getValue }) => {
-        const no = getValue();
+        const no = getValue()
         return new Intl.NumberFormat("en-US", {
           minimumIntegerDigits: 2,
           useGrouping: false,
-        }).format(no as number);
+        }).format(no as number)
       },
     },
     {
-      id: "edit",
-      // header: "Edit",
+      id: "actions",
+      header: "Actions",
       cell: ({ row }) => (
-        <Button
-          variant="outline"
-          className=' bg-transparent'
-          onClick={() => {
-            setEditingCourse(row.original);
-            editForm.reset({
-              title: row.original.title,
-              courseContent: row.original.courseContent,
-              duration: row.original.duration,
-            });
-            setIsDialogOpen(true);
-          }}
-        >
-          <Pencil className='size-4'/>
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            className="bg-transparent"
+            onClick={() => {
+              setEditingCourse(row.original)
+              editForm.reset({
+                title: row.original.title,
+                courseContent: row.original.courseContent,
+                duration: row.original.duration,
+              })
+              setIsDialogOpen(true)
+            }}
+          >
+            <Pencil className="size-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="bg-transparent text-red-500 hover:text-red-700"
+            onClick={() => {
+              setCourseToDelete(row.original)
+              setIsDeleteDialogOpen(true)
+            }}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
       ),
     },
-  ];
+  ]
 
   const table = useReactTable({
     data: courses,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-  });
+  })
 
   return (
     <div className="pl-8">
@@ -247,7 +253,7 @@ export default function CoursesAdministrationPage() {
                                 header.getContext()
                               )}
                         </TableHead>
-                      );
+                      )
                     })}
                   </TableRow>
                 ))}
@@ -333,7 +339,6 @@ export default function CoursesAdministrationPage() {
                         <ReactQuill
                           value={field.value}
                           onChange={field.onChange}
-                          // className="h-64 pb-6"
                           theme="snow"
                           modules={modules}
                         />
@@ -408,7 +413,6 @@ export default function CoursesAdministrationPage() {
                       <ReactQuill
                         value={field.value}
                         onChange={field.onChange}
-                        // className="absolute"
                         theme="snow"
                         modules={modules}
                       />
@@ -423,6 +427,26 @@ export default function CoursesAdministrationPage() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+          </DialogHeader>
+          <p>
+            This action cannot be undone. This will permanently delete the course
+            and all sessions associated with it.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
+  )
 }
