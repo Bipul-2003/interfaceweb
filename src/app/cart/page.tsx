@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react'
-import Image from 'next/image'
-import { X } from 'lucide-react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -29,6 +27,8 @@ export default function CartPage() {
   const [paymentMethod, setPaymentMethod] = useState('contact')
   const [userId, setUserId] = useState<string | undefined>()
   const [total, setTotal] = useState(0)
+  const paymentIntentCreated = useRef(false)
+  const cartFetched = useRef(false) // Added ref to track cart fetch
 
   const { removeFromCart, updateCart } = useCart()
 
@@ -49,6 +49,7 @@ export default function CartPage() {
       updateCart()
     } catch (error) {
       console.error('Error fetching cart:', error)
+      cartFetched.current = false // Reset on error to allow retry
     }
   }, [updateCart])
 
@@ -64,29 +65,38 @@ export default function CartPage() {
   }, [fetchCart, removeFromCart])
 
   useEffect(() => {
-    fetchUser()
-    fetchCart()
+    if (!cartFetched.current) { // Updated useEffect to only run once
+      cartFetched.current = true
+      fetchUser()
+      fetchCart()
+    }
   }, [fetchUser, fetchCart])
 
   useEffect(() => {
     const newTotal = cartItems.reduce((sum, item) => sum + Number(item.price), 0)
     setTotal(newTotal)
+  }, [cartItems])
 
-    if (newTotal > 0 && userId) {
+  useEffect(() => {
+    if (total > 0 && userId && !paymentIntentCreated.current) {
+      paymentIntentCreated.current = true
       fetch('/api/embedded-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: newTotal * 100,
+          amount: total * 100,
           productIds: cartItems.map((p) => p.id),
           userId,
         }),
       })
         .then((res) => res.json())
         .then((data) => setClientSecret(data.clientSecret))
-        .catch((error) => console.error('Error creating payment intent:', error))
+        .catch((error) => {
+          console.error('Error creating payment intent:', error)
+          paymentIntentCreated.current = false
+        })
     }
-  }, [cartItems, userId])
+  }, [total, userId, cartItems])
 
   const options: StripeElementsOptions = {
     clientSecret,

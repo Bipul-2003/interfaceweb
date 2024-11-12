@@ -18,6 +18,7 @@ export interface SessionType extends Document {
   startTime: string; // e.g., "03:00" for 3am
   endTime: string; // e.g., "18:00" for 6pm
   days: string[]; 
+  visibility: boolean;
 }
 
 const SessionSchema: Schema<SessionType> = new Schema(
@@ -100,7 +101,12 @@ const SessionSchema: Schema<SessionType> = new Schema(
       type: [String], 
       enum: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
       required: true 
-    }
+    },
+    visibility: {
+      type: Boolean,
+      // required: true,
+      default: true,
+    },
   },
   { timestamps: true }
 );

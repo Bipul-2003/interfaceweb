@@ -32,7 +32,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const fetchUser = async () => {
     const session = await getSession();
     setUser(session?.user);
-    console.log(session?.user || null);
+    // console.log(session?.user || null);
   };
 
   useEffect(() => {

@@ -41,7 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Pencil, Trash2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -51,24 +51,42 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function SessionAdministrationPage() {
-  const [sessions, setSession] = useState<[]>([]);
-  const [courses, setCourses] = useState<[]>([]);
-  const [creatingSession, setcreatingSession] = useState<boolean>(false);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [creatingSession, setCreatingSession] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any | null>(null);
   const currentDate = new Date();
   const defaultFromDate = addDays(currentDate, 5);
   const defaultToDate = addDays(defaultFromDate, 20);
   const daysOfWeek = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
   const fetchSessions = async (limit: number = 20) => {
+    setLoading(true);
     try {
       const response = await axios.get(
         `/api/admin/get-sessions?limit=${limit}`
       );
-      setSession(response.data.sessions);
+      setSessions(response.data.sessions);
     } catch (error) {
       console.error("Error fetching sessions: ", error);
+      toast({ title: "Error fetching sessions", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,11 +99,29 @@ export default function SessionAdministrationPage() {
       fetchSessions();
       fetchData();
     } catch (error) {
-      console.error("Error fetching enrollments: ", error);
+      console.error("Error fetching data: ", error);
+      toast({ title: "Error fetching data", variant: "destructive" });
     }
   }, []);
 
-  const form = useForm<z.infer<typeof createSessionSchema>>({
+  const createForm = useForm<z.infer<typeof createSessionSchema>>({
+    resolver: zodResolver(createSessionSchema),
+    defaultValues: {
+      dateRange: {
+        from: defaultFromDate,
+        to: defaultToDate,
+      },
+      days: [],
+      price: 10,
+      maxCapacity: 2,
+      maxWaitingCapacity: 2,
+      instructor: "",
+      startTime: "",
+      endTime: "",
+    },
+  });
+
+  const editForm = useForm<z.infer<typeof createSessionSchema>>({
     resolver: zodResolver(createSessionSchema),
     defaultValues: {
       dateRange: {
@@ -103,8 +139,7 @@ export default function SessionAdministrationPage() {
   });
 
   const onSubmit = async (data: z.infer<typeof createSessionSchema>) => {
-    // console.log(data);
-    setcreatingSession(true);
+    setCreatingSession(true);
     try {
       const response = await axios.post("/api/create-session", {
         ...data,
@@ -123,32 +158,69 @@ export default function SessionAdministrationPage() {
       console.log(error);
       toast({ title: "Error creating session", variant: "destructive" });
     } finally {
-      setcreatingSession(false);
+      setCreatingSession(false);
+    }
+  };
+
+  const onEditSubmit = async (data: z.infer<typeof createSessionSchema>) => {
+    if (!selectedSession) return;
+    setIsUpdating(true);
+    try {
+      const response = await axios.put(
+        `/api/admin/edit-session/${selectedSession._id}`,
+        data
+      );
+      if (response.status === 200) {
+        toast({ title: "Session updated successfully", variant: "success" });
+        fetchSessions();
+        setIsEditDialogOpen(false);
+        setSelectedSession(null);
+      }
+    } catch (error) {
+      console.log(error);
+      toast({ title: "Error updating session", variant: "destructive" });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedSession) return;
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(
+        `/api/admin/delete-session/${selectedSession._id}`
+      );
+      if (response.status === 200) {
+        toast({ title: "Session deleted successfully", variant: "success" });
+        fetchSessions();
+        setIsDeleteDialogOpen(false);
+        setSelectedSession(null);
+      }
+    } catch (error) {
+      console.log(error);
+      toast({ title: "Error deleting session", variant: "destructive" });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const columns: ColumnDef<any>[] = [
     {
-      id: "Sessionno.", // Custom ID for the column
+      id: "Sessionno.",
       header: "Session no.",
-      accessorFn: (row) => row.sessionno ?? "N/A", // Safely access nested properties
-      cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
+      accessorFn: (row) => row.sessionno ?? "N/A",
+      cell: ({ getValue }) => getValue() || "No title",
     },
     {
-      id: "course", // Custom ID for the column
+      id: "course",
       header: "Course",
-      accessorFn: (row) => row.course.title ?? "N/A", // Safely access nested properties
-      cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
+      accessorFn: (row) => row.course.title ?? "N/A",
+      cell: ({ getValue }) => getValue() || "No title",
     },
     {
-      id: "timeline", // Custom ID for the column
+      id: "timeline",
       header: "Timeline",
-      // accessorFn: (row) => {
-      //     const startDate = row.startDate ?? "N/A";
-      //     const endDate = row.endDate ?? "N/A";
-      //     return [startDate,endDate]
-
-      // }, // Safely access nested properties
       cell: ({ row }) => {
         const startDate = new Intl.DateTimeFormat("en-US", {
           month: "short",
@@ -163,73 +235,64 @@ export default function SessionAdministrationPage() {
         }).format(new Date(row.original.endDate as string));
 
         return startDate + " - " + endDate;
-      }, // Display the value or a default text
+      },
     },
     {
-      id: "timing", // Custom ID for the column
+      id: "timing",
       header: "Timing",
-
       cell: ({ row }) => {
         return row.original.startTime + " - " + row.original.endTime;
-      }, // Display the value or a default text
+      },
     },
     {
-      id: "days", // Custom ID for the column
+      id: "days",
       header: "Days",
-      accessorFn: (row) => row.days ?? "N/A", // Safely access nested properties
+      accessorFn: (row) => row.days ?? "N/A",
       cell: ({ getValue }) => {
         const days = getValue() as Array<string>;
-
         return <div className="max-w-lg">{days.join(", ")}</div>;
-      }, // Display the value or a default text
+      },
     },
     {
-      id: "instructor", // Custom ID for the column
+      id: "instructor",
       header: "Instructor",
-      accessorFn: (row) => row.instructor ?? "N/A", // Safely access nested properties
-      cell: ({ getValue }) => getValue() || "No title", // Display the value or a default text
+      accessorFn: (row) => row.instructor ?? "N/A",
+      cell: ({ getValue }) => getValue() || "No title",
     },
     {
-      id: "booked", // Custom ID for the column
+      id: "booked",
       header: "Booked",
-
-      accessorKey: "bookedStudentsCount", // Safely access nested properties
+      accessorKey: "bookedStudentsCount",
       cell: ({ row }) => {
         const count = row.getValue("booked") ?? 0;
         const maxcap = row.original.maxCapacity ?? 0;
-
         return count + "/" + maxcap;
-      }, // Display the value or a default text
+      },
     },
     {
-      id: "enrolled", // Custom ID for the column
+      id: "enrolled",
       header: "Enrolled",
-
-      accessorKey: "enrolledStudentsCount", // Safely access nested properties
+      accessorKey: "enrolledStudentsCount",
       cell: ({ row }) => {
         const count = row.getValue("enrolled") ?? 0;
         const maxcap = row.original.maxCapacity ?? 0;
-
         return count + "/" + maxcap;
-      }, // Display the value or a default text
+      },
     },
     {
-      id: "waitting", // Custom ID for the column
+      id: "waitting",
       header: "Waitting",
-
-      accessorKey: "waitingStudentsCount", // Safely access nested properties
+      accessorKey: "waitingStudentsCount",
       cell: ({ row }) => {
         const count = row.getValue("waitting") ?? 0;
         const maxcap = row.original.maxWaitingCapacity ?? 0;
-
         return count + "/" + maxcap;
-      }, // Display the value or a default text
+      },
     },
-
     {
-      id: "date", // Custom ID for the column
+      id: "date",
       header: "Updated on",
-      accessorFn: (row) => row.updatedAt ?? "N/A", // Safely access nested properties
+      accessorFn: (row) => row.updatedAt ?? "N/A",
       cell: ({ getValue }) => {
         const date = getValue();
         return date
@@ -243,24 +306,56 @@ export default function SessionAdministrationPage() {
           : "";
       },
     },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setSelectedSession(row.original);
+              setIsEditDialogOpen(true);
+              editForm.reset({
+                courseid: row.original.course._id,
+                dateRange: {
+                  from: new Date(row.original.startDate),
+                  to: new Date(row.original.endDate),
+                },
+                days: row.original.days,
+                price: row.original.price,
+                maxCapacity: row.original.maxCapacity,
+                maxWaitingCapacity: row.original.maxWaitingCapacity,
+                instructor: row.original.instructor,
+                startTime: row.original.startTime,
+                endTime: row.original.endTime,
+              });
+            }}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="bg-transparent text-red-500 hover:text-red-700"
+            size="icon"
+            onClick={() => {
+              setSelectedSession(row.original);
+              setIsDeleteDialogOpen(true);
+            }}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   const table = useReactTable({
     data: sessions,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
-    // onSortingChange: setSorting,
-    // onColumnFiltersChange: setColumnFilters,
-    // getPaginationRowModel: getPaginationRowModel(),
-    // getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // onRowSelectionChange: setRowSelection,
-    // state: {
-    //   sorting,
-    //   columnFilters,
-    //   rowSelection,
-    // },
   });
+
   return (
     <div className="pl-8">
       <h1 className="text-3xl font-bold pb-4">Sessions</h1>
@@ -284,12 +379,14 @@ export default function SessionAdministrationPage() {
                 className="max-w-sm border-2"
               />
             </div>
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
+            {loading ? (
+              <div className="text-center py-4">Loading sessions...</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
@@ -298,49 +395,49 @@ export default function SessionAdministrationPage() {
                                 header.getContext()
                               )}
                         </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center">
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center">
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="create">
           <div className="mt-8 ">
-            <Form {...form}>
+            <Form {...createForm}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={createForm.handleSubmit(onSubmit)}
                 className="flex-col space-y-6 md:ml-36 max-w-2xl">
                 <FormField
                   name="courseid"
-                  control={form.control}
+                  control={createForm.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="">Select Course</FormLabel>
@@ -367,7 +464,7 @@ export default function SessionAdministrationPage() {
                 <div className="md:flex md:space-x-4 items-start">
                   <FormField
                     name="dateRange"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel className="pb-2">
@@ -397,7 +494,10 @@ export default function SessionAdministrationPage() {
                               )}
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start" side="bottom" >
+                          <PopoverContent
+                            className="w-auto p-0"
+                            align="start"
+                            side="bottom">
                             <Calendar
                               initialFocus
                               mode="range"
@@ -408,16 +508,11 @@ export default function SessionAdministrationPage() {
                               className="w-auto"
                               today={currentDate}
                               disabled={(date) => {
-                                // date.getTime
-                                // Create a new date object for today
                                 const today = new Date();
-                                // Set the hours to the start of the day to ignore time part
                                 today.setHours(0, 0, 0, 0);
-                                // Subtract 5 days from today
                                 const fiveDaysAgo = new Date(
                                   today.setDate(today.getDate() + 5)
                                 );
-                                // Disable dates before 5 days ago and before Jan 1, 1900
                                 return (
                                   date < fiveDaysAgo ||
                                   date < new Date("1900-01-01")
@@ -435,24 +530,21 @@ export default function SessionAdministrationPage() {
                   />
                   <FormField
                     name="startTime"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Start Time</FormLabel>
-
                         <Input {...field} placeholder="hh:mm" />
-
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
                     name="endTime"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>End Time</FormLabel>
-
                         <Input {...field} placeholder="hh:mm" />
                         <FormMessage />
                       </FormItem>
@@ -465,7 +557,7 @@ export default function SessionAdministrationPage() {
                     {daysOfWeek.map((day) => (
                       <FormField
                         key={day}
-                        control={form.control}
+                        control={createForm.control}
                         name="days"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
@@ -494,7 +586,7 @@ export default function SessionAdministrationPage() {
                 <div className="flex items-center space-x-8">
                   <FormField
                     name="price"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Price</FormLabel>
@@ -517,11 +609,10 @@ export default function SessionAdministrationPage() {
                   />
                   <FormField
                     name="instructor"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Instructor</FormLabel>
-
                         <Input {...field} />
                         <FormMessage />
                       </FormItem>
@@ -531,7 +622,7 @@ export default function SessionAdministrationPage() {
                 <div className="flex items-center space-x-8">
                   <FormField
                     name="maxCapacity"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Session Capacity</FormLabel>
@@ -554,7 +645,7 @@ export default function SessionAdministrationPage() {
                   />
                   <FormField
                     name="maxWaitingCapacity"
-                    control={form.control}
+                    control={createForm.control}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Waiting Capacity</FormLabel>
@@ -576,8 +667,10 @@ export default function SessionAdministrationPage() {
                     )}
                   />
                 </div>
-
-                <Button disabled={creatingSession} type="submit" className="min-w-full">
+                <Button
+                  disabled={creatingSession}
+                  type="submit"
+                  className="min-w-full">
                   Create Session
                 </Button>
               </form>
@@ -585,6 +678,281 @@ export default function SessionAdministrationPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Session Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-dvh overflow-y-scroll">
+          <DialogHeader>
+            <DialogTitle>Edit Session</DialogTitle>
+            <DialogDescription>
+              Make changes to the session details.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(onEditSubmit)}
+              className="space-y-6">
+              <FormField
+                name="courseid"
+                control={editForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Course</FormLabel>
+                    <Select onValueChange={field.onChange} disabled value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a course" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {courses.map((course: any) => (
+                          <SelectItem key={course._id} value={course._id}>
+                            {course.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="sm:flex space-x-4 item-center">
+                <FormField
+                  name="dateRange"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="mb-2">Date Range</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild className='py-4'>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[260px] justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value?.from ? (
+                              field.value.to ? (
+                                <>
+                                  {format(field.value.from, "LLL dd, y")} -{" "}
+                                  {format(field.value.to, "LLL dd, y")}
+                                </>
+                              ) : (
+                                format(field.value.from, "LLL dd, y")
+                              )
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto " align="start">
+                        <Calendar
+                              initialFocus
+                              mode="range"
+                              defaultMonth={field.value?.from}
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              numberOfMonths={2}
+                              className="w-auto"
+                              today={currentDate}
+                              disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                const fiveDaysAgo = new Date(
+                                  today.setDate(today.getDate() + 5)
+                                );
+                                return (
+                                  date < fiveDaysAgo ||
+                                  date < new Date("1900-01-01")
+                                );
+                              }}
+                            />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="startTime"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start Time</FormLabel>
+                      <Input {...field} placeholder="hh:mm" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="endTime"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>End Time</FormLabel>
+                      <Input {...field} placeholder="hh:mm" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
+                <FormLabel>Select Days</FormLabel>
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                  {daysOfWeek.map((day) => (
+                    <FormField
+                      key={day}
+                      control={editForm.control}
+                      name="days"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value.includes(day)}
+                              onCheckedChange={(checked) => {
+                                const newValue = checked
+                                  ? [...field.value, day]
+                                  : field.value.filter((d) => d !== day);
+                                field.onChange(newValue);
+                              }}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              {day.charAt(0).toUpperCase() + day.slice(1)}
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex space-x-4">
+                <FormField
+                  name="price"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="instructor"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instructor</FormLabel>
+                      <Input {...field} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex space-x-4">
+                <FormField
+                  name="maxCapacity"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Session Capacity</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="maxWaitingCapacity"
+                  control={editForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Waiting Capacity</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isUpdating}>
+                  {isUpdating ? "Updating..." : "Save changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this session? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

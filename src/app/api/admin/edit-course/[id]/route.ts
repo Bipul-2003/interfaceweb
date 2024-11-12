@@ -28,7 +28,7 @@ export async function PUT(
       return Response.json({ message: "Course not found" }, { status: 404 });
     }
 
-    return Response.json({ message: "Enrollment success" }, { status: 200 });
+    return Response.json({ message: "course edited successfully" }, { status: 200 });
   } catch (error) {
     return Response.json(
       { message: "Failed to update course" },

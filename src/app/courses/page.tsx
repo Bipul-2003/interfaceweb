@@ -54,6 +54,8 @@ const Courses = () => {
           <Card key={String(course._id)}>
             <Image
               src="/learning.svg"
+              width={300}
+              height={150}
               alt="Course Image"
               className="rounded-t-lg object-fit object-left w-full aspect-[8/2] bg-muted"
             />

@@ -47,7 +47,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Pencil, Trash2 } from "lucide-react"
+import { Loader2, Pencil, Trash2 } from "lucide-react"
 
 const Font = {
   whitelist: ['arial', 'comic-sans', 'roboto', 'times-new-roman', 'calibri'],
@@ -60,10 +60,21 @@ export default function CoursesAdministrationPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const fetchData = async (limit: number = 20) => {
-    const coursesResponse = await axios.get("/api/courses")
-    setCourses(coursesResponse.data.courses)
+    setIsLoading(true)
+    try {
+      const coursesResponse = await axios.get("/api/courses")
+      setCourses(coursesResponse.data.courses)
+    } catch (error) {
+      console.error("Error fetching courses: ", error)
+      toast({ title: "Error fetching courses", variant: "destructive" })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const modules = {
@@ -83,11 +94,7 @@ export default function CoursesAdministrationPage() {
   }
 
   useEffect(() => {
-    try {
-      fetchData()
-    } catch (error) {
-      console.error("Error fetching courses: ", error)
-    }
+    fetchData()
   }, [])
 
   const form = useForm<z.infer<typeof createCourseSchema>>({
@@ -117,6 +124,7 @@ export default function CoursesAdministrationPage() {
       if (response.status === 201) {
         toast({ title: "Course created successfully", variant: "success" })
         fetchData()
+        form.reset()
       }
     } catch (error) {
       console.log(error)
@@ -127,6 +135,7 @@ export default function CoursesAdministrationPage() {
   }
 
   const onEditSubmit = async (data: z.infer<typeof createCourseSchema>) => {
+    setIsUpdating(true)
     try {
       const response = await axios.put(`/api/admin/edit-course/${editingCourse._id}`, data)
 
@@ -139,10 +148,13 @@ export default function CoursesAdministrationPage() {
     } catch (error) {
       console.log(error)
       toast({ title: "Error updating course", variant: "destructive" })
+    } finally {
+      setIsUpdating(false)
     }
   }
 
   const handleDelete = async () => {
+    setIsDeleting(true)
     try {
       const response = await axios.delete(`/api/admin/delete-course/${courseToDelete._id}`)
 
@@ -154,6 +166,8 @@ export default function CoursesAdministrationPage() {
     } catch (error) {
       console.log(error)
       toast({ title: "Error deleting course", variant: "destructive" })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -239,54 +253,60 @@ export default function CoursesAdministrationPage() {
                 className="max-w-sm border-2"
               />
             </div>
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        )
+                      })}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="create">
@@ -352,7 +372,14 @@ export default function CoursesAdministrationPage() {
                   type="submit"
                   className="min-w-full mt-20"
                 >
-                  Create Course
+                  {creatingCourse ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Course
+                    </>
+                  ) : (
+                    'Create Course'
+                  )}
                 </Button>
               </form>
             </Form>
@@ -361,12 +388,12 @@ export default function CoursesAdministrationPage() {
       </Tabs>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[900px]">
+        <DialogContent className="md:max-w-[900px] max-w-3xl max-h-screen overflow-y-scroll">
           <DialogHeader>
             <DialogTitle>Edit Course</DialogTitle>
           </DialogHeader>
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4 ">
               <FormField
                 name="title"
                 control={editForm.control}
@@ -422,7 +449,16 @@ export default function CoursesAdministrationPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="pt-4">Save Changes</Button>
+              <Button type="submit" className="pt-4" disabled={isUpdating}>
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving Changes
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </Button>
             </form>
           </Form>
         </DialogContent>
@@ -441,8 +477,15 @@ export default function CoursesAdministrationPage() {
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting
+                </>
+              ) : (
+                'Delete'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
