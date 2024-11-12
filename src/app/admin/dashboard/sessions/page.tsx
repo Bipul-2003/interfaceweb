@@ -914,11 +914,11 @@ export default function SessionAdministrationPage() {
                 />
               </div>
               <DialogFooter>
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={() => setIsEditDialogOpen(false)}>
                   Cancel
-                </Button>
+                </Button> */}
                 <Button type="submit" disabled={isUpdating}>
                   {isUpdating ? "Updating..." : "Save changes"}
                 </Button>
