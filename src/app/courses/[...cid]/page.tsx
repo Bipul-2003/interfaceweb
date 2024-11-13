@@ -249,7 +249,7 @@ export default function Component({ params }: { params: { cid: string } }) {
           <TabsTrigger value="content">Description</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
         </TabsList>
-        <TabsContent value="content" className="p-2 max-w-screen-md">
+        <TabsContent value="content" className="p-2 max-w-screen-lg">
           <CourseContentRenderer content={state.course.courseContent} />
         </TabsContent>
         <TabsContent value="sessions" className="p-2 max-w-screen-lg">
