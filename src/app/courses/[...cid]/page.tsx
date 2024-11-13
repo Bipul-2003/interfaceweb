@@ -25,7 +25,7 @@ const DialogDescription = dynamic(() => import("@radix-ui/react-dialog").then(mo
 const SessionCards = dynamic(() => import("@/components/SessionCards"));
 
 // Lazy load React Quill styles
-import"react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css";
 import CourseContentRenderer from "@/components/CourseContentRenderer";
 
 const fetchCourseData = async (id: string) => {
@@ -39,7 +39,7 @@ const fetchCourseData = async (id: string) => {
   };
 };
 
-const Course = ({ params }: { params: { cid: string } }) => {
+export default function Component({ params }: { params: { cid: string } }) {
   const { toast } = useToast();
   const id = params.cid.toString();
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ const Course = ({ params }: { params: { cid: string } }) => {
   const [selectedSession, setSelectedSession] = useState<SessionType | null>(null);
   const [bookingHappening, setBookingHappening] = useState<string | null>(null);
   const [buttonDisabled, setButtonDisabled] = useState(false);
-  const [label, setLabel] = useState("Add to Cart");
+  //const [label, setLabel] = useState("Add to Cart"); //Removed as per update 2
   const [state, setState] = useState<{
     user: User | null;
     sessions: SessionType[];
@@ -110,15 +110,6 @@ const Course = ({ params }: { params: { cid: string } }) => {
             session._id === sessionId ? updatedSession : session
           ),
         }));
-        setLabel(
-          updatedSession.enrolledStudents.includes(state.user?.id)
-            ? "Enrolled"
-            : updatedSession.waitingStudents.includes(state.user?.id)
-            ? "Waiting"
-            : updatedSession.bookedStudents.includes(state.user?.id)
-            ? "Booked"
-            : "Add to Cart"
-        );
         setButtonDisabled(true);
       }
       updateCart();
@@ -142,7 +133,116 @@ const Course = ({ params }: { params: { cid: string } }) => {
 
   return (
     <div className="min-h-screen w-full flex flex-col pt-24 mx-6">
-      {/* Dialog and other components ... */}
+      <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
+        <DialogContent className="op">
+          <DialogHeader>
+            <DialogTitle className="text-4xl">Details</DialogTitle>
+            <DialogDescription className="">
+              Please go through it thoroughly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <ul className="space-y-4">
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Start Date:</span>
+                {selectedSession && new Date(selectedSession.startDate).toLocaleDateString(
+                  "en-us",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  }
+                )}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">End Date: </span>
+                {selectedSession && new Date(selectedSession.endDate).toLocaleDateString(
+                  "en-us",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  }
+                )}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Instructor: </span>
+                {selectedSession?.instructor}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Days: </span>
+                {selectedSession?.days.map((day: string) => `${day} `)}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Seats Available: </span>
+                {selectedSession && `${
+                  selectedSession.maxCapacity -
+                  selectedSession.enrolledStudents.length
+                }/${selectedSession.maxCapacity}`}
+              </li>
+              {selectedSession && selectedSession.maxCapacity -
+                selectedSession.enrolledStudents.length === 0 && (
+                <li className="flex w-full justify-between">
+                  <span className="font-bold">Waiting Seats Available: </span>
+                  {`${
+                    selectedSession.maxWaitingCapacity -
+                    selectedSession.waitingStudents.length
+                  }/${selectedSession.maxWaitingCapacity}`}
+                </li>
+              )}
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Timing: </span>
+                {selectedSession && `${selectedSession.startTime} - ${selectedSession.endTime}`}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Booking Due Date: </span>
+                {selectedSession && new Date(selectedSession.bookingLastDate).toLocaleDateString(
+                  "en-us",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  }
+                )}
+              </li>
+              <li className="flex w-full justify-between">
+                <span className="font-bold">Payment Due Date: </span>
+                {selectedSession && new Date(selectedSession.paymentLastDate).toLocaleDateString(
+                  "en-us",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  }
+                )}
+              </li>
+            </ul>
+            <p className="my-3 opacity-50">Price:</p>
+            <div className="flex items-center justify-between pl-4">
+              <p className="font-bold text-5xl">
+                {selectedSession && `$${selectedSession.price}`}{" "}
+                <span className="text-lg font-normal">only</span>
+              </p>
+              <Button
+                onClick={() =>
+                  !buttonDisabled && selectedSession && createEnrollment(selectedSession._id as string)
+                }
+                disabled={buttonDisabled || !!status}
+              >
+                {bookingHappening === selectedSession?._id ? (
+                  <LoadingSpinner />
+                ) : (
+                  ["Enrolled", "Waiting", "Booked"].find((status) =>
+                    (selectedSession as any)?.[`${status.toLowerCase()}Students`]
+                      ?.toString()
+                      .includes(state.user?.id || " ")
+                  ) || "Add to Cart"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <h1 className="font-bold text-3xl pb-4">{state.course.title}</h1>
       <Tabs defaultValue="content">
         <TabsList>
@@ -151,8 +251,6 @@ const Course = ({ params }: { params: { cid: string } }) => {
         </TabsList>
         <TabsContent value="content" className="p-2 max-w-screen-md">
           <CourseContentRenderer content={state.course.courseContent} />
-
-          {/* <div className="prose mt-2 quill-content" dangerouslySetInnerHTML={{ __html: state.course.courseContent }} /> */}
         </TabsContent>
         <TabsContent value="sessions" className="p-2 max-w-screen-lg">
           <div className="grid md:grid-cols-4 gap-2">
@@ -182,6 +280,4 @@ const Course = ({ params }: { params: { cid: string } }) => {
       </Tabs>
     </div>
   );
-};
-
-export default Course;
+}
