@@ -110,7 +110,7 @@ export default function CartPage() {
         <p>Your cart is empty.</p>
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="sm:flex gap-4">
             {cartItems.map((item) => (
               <CartCard 
                 key={item.sessionId}
