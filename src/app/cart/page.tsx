@@ -27,8 +27,7 @@ export default function CartPage() {
   const [paymentMethod, setPaymentMethod] = useState('contact')
   const [userId, setUserId] = useState<string | undefined>()
   const [total, setTotal] = useState(0)
-  const paymentIntentCreated = useRef(false)
-  const cartFetched = useRef(false) // Added ref to track cart fetch
+  const cartFetched = useRef(false)
 
   const { removeFromCart, updateCart } = useCart()
 
@@ -43,10 +42,12 @@ export default function CartPage() {
   }, [])
 
   const fetchCart = useCallback(async () => {
+    if (cartFetched.current) return
     try {
       const response = await axios.get('/api/getCart')
       setCartItems(response.data)
       updateCart()
+      cartFetched.current = true
     } catch (error) {
       console.error('Error fetching cart:', error)
       cartFetched.current = false // Reset on error to allow retry
@@ -57,19 +58,16 @@ export default function CartPage() {
     try {
       await axios.patch('/api/getCart', { sessionid: sessionId })
       await axios.get(`/api/admin/reject-enrollment/${enrollmentId}`)
-      await fetchCart()
+      setCartItems(prevItems => prevItems.filter(item => item.sessionId !== sessionId))
       removeFromCart()
     } catch (error) {
       console.error('Error removing item from cart:', error)
     }
-  }, [fetchCart, removeFromCart])
+  }, [removeFromCart])
 
   useEffect(() => {
-    if (!cartFetched.current) { // Updated useEffect to only run once
-      cartFetched.current = true
-      fetchUser()
-      fetchCart()
-    }
+    fetchUser()
+    fetchCart()
   }, [fetchUser, fetchCart])
 
   useEffect(() => {
@@ -77,26 +75,34 @@ export default function CartPage() {
     setTotal(newTotal)
   }, [cartItems])
 
-  useEffect(() => {
-    if (total > 0 && userId && !paymentIntentCreated.current) {
-      paymentIntentCreated.current = true
-      fetch('/api/embedded-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: total * 100,
-          productIds: cartItems.map((p) => p.id),
-          userId,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => setClientSecret(data.clientSecret))
-        .catch((error) => {
-          console.error('Error creating payment intent:', error)
-          paymentIntentCreated.current = false
+  const createPaymentIntent = useCallback(async () => {
+    if (total > 0 && userId) {
+      try {
+        const response = await fetch('/api/embedded-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: total * 100,
+            productIds: cartItems.map((item) => item.sessionId),
+            userId,
+          }),
         })
+        const data = await response.json()
+        setClientSecret(data.clientSecret)
+      } catch (error) {
+        console.error('Error creating payment intent:', error)
+      }
     }
   }, [total, userId, cartItems])
+
+  const handlePaymentMethodChange = (value: string) => {
+    setPaymentMethod(value)
+    if (value === 'card') {
+      createPaymentIntent()
+    } else {
+      setClientSecret('')
+    }
+  }
 
   const options: StripeElementsOptions = {
     clientSecret,
@@ -142,7 +148,7 @@ export default function CartPage() {
               </DialogHeader>
               <RadioGroup
                 value={paymentMethod}
-                onValueChange={setPaymentMethod}
+                onValueChange={handlePaymentMethodChange}
                 className="mb-4 flex"
               >
                 <div className="flex items-center space-x-2">

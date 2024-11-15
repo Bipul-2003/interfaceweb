@@ -34,6 +34,7 @@ export async function PATCH(
     const { id } = params;
     const { paymentDone, bookingConfirmed } = await req.json();
 
+    // Find the enrollment by ID
     const enrollment = await EnrollmentModel.findById(id);
     if (!enrollment) {
       return Response.json(
@@ -41,6 +42,8 @@ export async function PATCH(
         { status: 404 }
       );
     }
+
+    // Validate enrollment status
     if (enrollment.status === "waiting") {
       return Response.json(
         { message: "Enrollment is in waiting status" },
@@ -53,6 +56,8 @@ export async function PATCH(
         { status: 400 }
       );
     }
+
+    // Find the session associated with the enrollment
     const session = await SessionModel.findById(enrollment.session);
     if (!session) {
       return Response.json({ message: "Session not found" }, { status: 404 });
@@ -61,27 +66,41 @@ export async function PATCH(
       return Response.json({ message: "Session is full" }, { status: 400 });
     }
 
-    if (paymentDone == true && bookingConfirmed == true) {
-      enrollment.paymentStatus = "completed";
-      enrollment.status = "booked";
+    // Update enrollment and session if both payment and booking are confirmed
+    if (paymentDone && bookingConfirmed) {
+      await EnrollmentModel.findByIdAndUpdate(id, {
+        paymentStatus: "completed",
+        status: "booked"
+      });
 
-      session.bookedStudents.push(enrollment.user);
-      session.enrolledStudents = session.enrolledStudents.filter(
-        (student) => student.toString() !== enrollment.user.toString()
+      await SessionModel.findByIdAndUpdate(
+        session._id,
+        {
+          $push: { bookedStudents: enrollment.user },
+          $pull: { enrolledStudents: enrollment.user }
+        }
       );
+
+      // If session has a waiting list, enroll the first waiting student if space allows
       if (
         session.waitingStudents.length > 0 &&
-        session.enrolledStudents.length < session.maxCapacity && session.bookedStudents.length < session.maxCapacity
+        session.bookedStudents.length < session.maxCapacity
       ) {
-        const id = session.waitingStudents.shift();
-        if (id) {
-          session.enrolledStudents.push(id);
-          const waitingstudentenrollment =
-            await EnrollmentModel.findOneAndUpdate(
-              { user: id, session: session._id },
-              { status: "enrolled", bookedOn: new Date() }
-            );
-          if (!waitingstudentenrollment) {
+        const waitingUserId = session.waitingStudents.shift();
+
+        if (waitingUserId) {
+          // Add the waiting student to enrolled students list and update their enrollment status
+          await SessionModel.findByIdAndUpdate(session._id, {
+            $push: { enrolledStudents: waitingUserId },
+            $set: { waitingStudents: session.waitingStudents }
+          });
+
+          const waitingStudentEnrollment = await EnrollmentModel.findOneAndUpdate(
+            { user: waitingUserId, session: session._id },
+            { status: "enrolled", bookedOn: new Date() }
+          );
+
+          if (!waitingStudentEnrollment) {
             return Response.json(
               { message: "Error updating waiting student enrollment" },
               { status: 500 }
@@ -90,11 +109,10 @@ export async function PATCH(
         }
       }
     }
-    await session.save();
-    await enrollment.save();
 
+    // Return success response with the updated enrollment
     return Response.json(
-      { message: "Enrollment updated", data: enrollment },
+      { message: "Enrollment updated", data: await EnrollmentModel.findById(id) },
       { status: 200 }
     );
   } catch (error) {

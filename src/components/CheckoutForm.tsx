@@ -17,11 +17,13 @@ export default function CheckoutForm({ amount, cartItems, userId }: any) {
   const elements = useElements();
 
   const [error, setError] = useState<string | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  // const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  console.log(cartItems);
+  
+  // const router = useRouter();
 
   // React.useEffect(() => {
   //   if (!stripe) {
@@ -115,7 +117,7 @@ export default function CheckoutForm({ amount, cartItems, userId }: any) {
       const result = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/return?product_ids=${cartItems.map((p:any) => p._id).join(',')}&user_id=${userId}`,
+          return_url: `${window.location.origin}/return?product_ids=${cartItems.map((p:any) => p.enrollmentId).join(',')}&user_id=${userId}`,
         },
       })
 
