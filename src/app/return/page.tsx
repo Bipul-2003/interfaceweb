@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import axios from "axios";
+import { useCart } from "@/context/cartCount";
 
 interface OrderDetails {
   orderId: string;
@@ -26,6 +27,8 @@ function SuccessPageComponent() {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const {updateCart} = useCart();
 
   useEffect(() => {
     const updateDatabase = async () => {
@@ -68,14 +71,15 @@ function SuccessPageComponent() {
 
         for (const id of productIds) {
           try {
-            console.log("Processing enrollment for product ID:", id);
+            // console.log("Processing enrollment for product ID:", id);
             const res = await axios.patch(`/api/enrollments/${id}`, {
               paymentDone: true,
               bookingConfirmed: true,
             });
             if (res.status === 200) {
-              console.log(`Enrollment ${id} approved`);
-              await axios.patch("/api/getCart", { sessionid: id });
+              updateCart();
+              // console.log(`Enrollment ${id} approved`);
+              // await axios.patch("/api/getCart", { sessionid: id });
             }
           } catch (error: any) {
             console.error(`Error approving booking for ${id}: `, error);
