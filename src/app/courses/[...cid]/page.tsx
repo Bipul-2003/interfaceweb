@@ -1,69 +1,80 @@
-"use client";
+'use client'
 
-import React, { useEffect, useState, useCallback } from "react";
-import dynamic from 'next/dynamic';
-import axios from "axios";
-import { CourseType } from "@/models/Courses";
-import { SessionType } from "@/models/Sessions";
-import { User } from "next-auth";
-import { useCart } from "@/context/cartCount";
-import { useToast } from "@/components/ui/use-toast";
-import getSession from "@/utils/getSession";
+import React, { useEffect, useState, useCallback } from "react"
+import dynamic from 'next/dynamic'
+import axios from "axios"
+import Link from 'next/link'
+import { CourseType } from "@/models/Courses"
+import { SessionType } from "@/models/Sessions"
+import { User } from "next-auth"
+import { useCart } from "@/context/cartCount"
+import { useToast } from "@/components/ui/use-toast"
+import getSession from "@/utils/getSession"
+import { ChevronRight } from 'lucide-react'
+
+// Import shadcn/ui Breadcrumb components
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 // Dynamic imports for better code splitting
-const LoadingSpinner = dynamic(() => import("@/components/ui/loader").then(mod => mod.LoadingSpinner));
-const Tabs = dynamic(() => import("@/components/ui/tabs").then(mod => mod.Tabs));
-const TabsContent = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsContent));
-const TabsList = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsList));
-const TabsTrigger = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsTrigger));
-const Button = dynamic(() => import("@/components/ui/button").then(mod => mod.Button));
-const Dialog = dynamic(() => import("@/components/ui/dialog").then(mod => mod.Dialog));
-const DialogContent = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogContent));
-const DialogHeader = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogHeader));
-const DialogTitle = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogTitle));
-const DialogDescription = dynamic(() => import("@radix-ui/react-dialog").then(mod => mod.DialogDescription));
-const SessionCards = dynamic(() => import("@/components/SessionCards"));
+const LoadingSpinner = dynamic(() => import("@/components/ui/loader").then(mod => mod.LoadingSpinner))
+const Tabs = dynamic(() => import("@/components/ui/tabs").then(mod => mod.Tabs))
+const TabsContent = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsContent))
+const TabsList = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsList))
+const TabsTrigger = dynamic(() => import("@/components/ui/tabs").then(mod => mod.TabsTrigger))
+const Button = dynamic(() => import("@/components/ui/button").then(mod => mod.Button))
+const Dialog = dynamic(() => import("@/components/ui/dialog").then(mod => mod.Dialog))
+const DialogContent = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogContent))
+const DialogHeader = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogHeader))
+const DialogTitle = dynamic(() => import("@/components/ui/dialog").then(mod => mod.DialogTitle))
+const DialogDescription = dynamic(() => import("@radix-ui/react-dialog").then(mod => mod.DialogDescription))
+const SessionCards = dynamic(() => import("@/components/SessionCards"))
 
 // Lazy load React Quill styles
-import "react-quill/dist/quill.snow.css";
-import CourseContentRenderer from "@/components/CourseContentRenderer";
+import "react-quill/dist/quill.snow.css"
+import CourseContentRenderer from "@/components/CourseContentRenderer"
 
 const fetchCourseData = async (id: string) => {
   const [sessionsResponse, courseResponse] = await Promise.all([
     axios.get(`/api/get-sessions/${id}`),
     axios.get(`/api/courses/${id}`),
-  ]);
+  ])
   return {
     sessions: sessionsResponse.data.sessions,
     course: courseResponse.data.course,
-  };
-};
+  }
+}
 
 export default function Component({ params }: { params: { cid: string } }) {
-  const { toast } = useToast();
-  const id = params.cid.toString();
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<string | null>(null);
-  const [selectedSession, setSelectedSession] = useState<SessionType | null>(null);
-  const [bookingHappening, setBookingHappening] = useState<string | null>(null);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
-  //const [label, setLabel] = useState("Add to Cart"); //Removed as per update 2
+  const { toast } = useToast()
+  const id = params.cid.toString()
+  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<string | null>(null)
+  const [selectedSession, setSelectedSession] = useState<SessionType | null>(null)
+  const [bookingHappening, setBookingHappening] = useState<string | null>(null)
+  const [buttonDisabled, setButtonDisabled] = useState(false)
   const [state, setState] = useState<{
-    user: User | null;
-    sessions: SessionType[];
-    course: CourseType;
+    user: User | null
+    sessions: SessionType[]
+    course: CourseType
   }>({
     user: null,
     sessions: [],
     course: {} as CourseType,
-  });
+  })
 
-  const { updateCart } = useCart();
+  const { updateCart } = useCart()
 
   const fetchAndSetData = useCallback(async () => {
     try {
-      const session = await getSession();
-      const { sessions, course } = await fetchCourseData(id);
+      const session = await getSession()
+      const { sessions, course } = await fetchCourseData(id)
       const bookingStatus =
         ["Enrolled", "Waiting", "Booked"].find((status) =>
           sessions.some((s: any) =>
@@ -71,68 +82,83 @@ export default function Component({ params }: { params: { cid: string } }) {
               .toString()
               .includes(session?.user?.id || " ")
           )
-        ) || null;
+        ) || null
 
-      setStatus(bookingStatus);
+      setStatus(bookingStatus)
       setState({
         user: session?.user || null,
         sessions,
         course,
-      });
+      })
     } catch (error) {
-      console.error(error);
-      toast({ title: "Error fetching data", variant: "destructive" });
+      console.error(error)
+      toast({ title: "Error fetching data", variant: "destructive" })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [id, toast]);
+  }, [id, toast])
 
   useEffect(() => {
-    fetchAndSetData();
-  }, [fetchAndSetData]);
+    fetchAndSetData()
+  }, [fetchAndSetData])
 
   const createEnrollment = useCallback(async (sessionId: string) => {
-    setSelectedSession(null);
+    setSelectedSession(null)
     try {
-      setBookingHappening(sessionId);
+      setBookingHappening(sessionId)
       const res = await axios.post("/api/create-enrollment", {
         user: state.user?.id,
         session: sessionId,
-      });
+      })
 
       if (res.status === 200) {
-        toast({ title: res.data.message, variant: "success" });
-        const updatedSession = res.data.data;
+        toast({ title: res.data.message, variant: "success" })
+        const updatedSession = res.data.data
 
         setState((prevState) => ({
           ...prevState,
           sessions: prevState.sessions.map((session) =>
             session._id === sessionId ? updatedSession : session
           ),
-        }));
-        setButtonDisabled(true);
+        }))
+        setButtonDisabled(true)
       }
-      updateCart();
+      updateCart()
     } catch (error: any) {
-      console.error(error);
+      console.error(error)
       if (error.response) {
-        toast({ title: error.response.data.message, variant: "destructive" });
+        toast({ title: error.response.data.message, variant: "destructive" })
       }
     } finally {
-      setBookingHappening(null);
+      setBookingHappening(null)
     }
-  }, [state.user?.id, toast, updateCart]);
+  }, [state.user?.id, toast, updateCart])
 
   if (loading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center">
         <LoadingSpinner className="size-20 opacity-40" />
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen w-full flex flex-col pt-24 mx-6">
+      {/* shadcn/ui Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/courses">Courses</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{state.course.title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
         <DialogContent className="op">
           <DialogHeader>
@@ -279,5 +305,5 @@ export default function Component({ params }: { params: { cid: string } }) {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

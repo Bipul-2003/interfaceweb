@@ -34,7 +34,6 @@ export default function SignUpForm() {
   const [loading, setloading] = useState(false);
   const [dialogopened, setDialogopened] = useState(false);
 
-
   const router = useRouter();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -47,7 +46,6 @@ export default function SignUpForm() {
 
   const { toast } = useToast();
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    //console.log(data);
     setloading(true);
     try {
       const response = await axios.post("/api/sign-up", data);
@@ -55,25 +53,43 @@ export default function SignUpForm() {
         setDialogopened(true);
         toast({
           title: "Success",
-          description: "User created successfully"
-        })
+          description: "User created successfully",
+        });
       }
     } catch (error) {
-      console.log("Field to sign-up", error);
+      console.log("Failed to sign-up", error);
+      // Type guard for axios error
+      if (axios.isAxiosError(error)) {
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.message || "An error occurred during sign-up",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
     } finally {
       setloading(false);
     }
   };
-  
+
   return (
     <div className="flex justify-center items-center h-dvh">
       <div className="">
         <Card className="">
-        <Dialog open={dialogopened} onOpenChange={setDialogopened}>
-          <DialogContent>
-            <InputOTPForm email={form.getValues().email} username={form.getValues().username}/>
-          </DialogContent>
-        </Dialog>
+          <Dialog open={dialogopened} onOpenChange={setDialogopened}>
+            <DialogContent>
+              <InputOTPForm
+                email={form.getValues().email}
+                username={form.getValues().username}
+              />
+            </DialogContent>
+          </Dialog>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <CardHeader>
@@ -165,14 +181,15 @@ export default function SignUpForm() {
                 />
               </CardContent>
               <CardFooter>
-                <Button className="w-full" disabled={loading} type="submit">{loading ? "Signing up..." : "Sign Up"}
+                <Button className="w-full" disabled={loading} type="submit">
+                  {loading ? "Signing up..." : "Sign Up"}
                 </Button>
               </CardFooter>
             </form>
           </Form>
           <div className="text-center pb-2">
             <p>
-              Already a member ?{" "}
+              Already a member?{" "}
               <Link
                 href="/sign-in"
                 className="text-blue-600 hover:text-blue-800">
@@ -181,7 +198,6 @@ export default function SignUpForm() {
             </p>
           </div>
         </Card>
-        
       </div>
     </div>
   );

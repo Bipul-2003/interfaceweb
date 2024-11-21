@@ -21,10 +21,11 @@ export async function POST(req: Request) {
   try {
     const existingSession = await SessionModel.findOne({
       courseid: new mongoose.Types.ObjectId(courseid),
-      startDate:dateRange.from,
+      startDate: dateRange.from,
       startTime,
     });
-    if (new Date(dateRange.from) < new Date(Date.now())) {
+
+    if (new Date(dateRange.from) < new Date()) {
       return Response.json(
         { message: "Enter a valid start date" },
         { status: 400 }
@@ -37,20 +38,28 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    const startDateObj = new Date(dateRange.from);
-    const paymentLastDate = new Date(
-      startDateObj.getTime() - 3 * 24 * 60 * 60 * 1000
-    );
-    // console.log(paymentLastDate);
 
-    const bookingLastDate = new Date(
-      startDateObj.getTime() - 5 * 24 * 60 * 60 * 1000
-    );
-    // console.log(bookingLastDate);
+    const startDateObj = new Date(dateRange.from);
+    const paymentLastDate = new Date(startDateObj.getTime() - 2 * 24 * 60 * 60 * 1000);
+    const bookingLastDate = new Date(startDateObj.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+    // Find the last session for this course and get its sessionno
+    const lastSession = await SessionModel.findOne({ courseid: new mongoose.Types.ObjectId(courseid) })
+      .sort({ sessionno: -1 })
+      .select('sessionno');
+
+    let newSessionNo = 1;
+    if (lastSession) {
+      newSessionNo = Math.floor((lastSession.sessionno + 1) / 1000) * 1000 + 1;
+    }
+
+    // Ensure the sessionno is always 3 digits
+    newSessionNo = Number(newSessionNo.toString().padStart(3, '0'))
+
     const newSession = new SessionModel({
       courseid: new mongoose.Types.ObjectId(courseid),
-      startDate:dateRange.from,
-      sessionno: (await SessionModel.countDocuments({courseid})) + 1,
+      startDate: dateRange.from,
+      sessionno: newSessionNo,
       endDate: dateRange.to,
       instructor,
       maxCapacity,
@@ -71,7 +80,6 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (error) {
-    // It's a good practice to handle and log the error
     console.error("Error creating Session:", error);
     return Response.json(
       { message: "Error creating Session" },

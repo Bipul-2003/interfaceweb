@@ -15,9 +15,13 @@ export default function Trainings() {
               <h1 className="text-3xl font-bold  sm:text-4xl md:text-5xl lg:text-6xl/none">
                 Cutting-Edge IT Training at Interface Hub
               </h1>
-              <p className="mx-auto max-w-[700px] py-4 text-muted md:text-xl">
-                Powered by an institution with a proven track record of
-                excellence since 2001.
+              <p className="mx-auto max-w-[900px] py-4 text-black md:text-lg">
+                {/* Powered by an institution with a proven track record of
+                excellence since 2001. */}
+                Partners with a premier institution that has
+                empowered students since 2001 to complete their courses and
+                launch successful careers at top companies like Google,
+                Microsoft, and more.
               </p>
             </div>
             <div className="space-x-4">

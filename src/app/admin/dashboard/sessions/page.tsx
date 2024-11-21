@@ -10,7 +10,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { addDays, format } from "date-fns";
+import { addDays, format, differenceInDays } from "date-fns";
 import {
   Table,
   TableBody,
@@ -41,7 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Pencil, Trash2 } from "lucide-react";
+import { CalendarIcon, Pencil, Trash2, Users } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -59,6 +59,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function SessionAdministrationPage() {
   const [sessions, setSessions] = useState<any[]>([]);
@@ -74,6 +75,10 @@ export default function SessionAdministrationPage() {
   const defaultFromDate = addDays(currentDate, 5);
   const defaultToDate = addDays(defaultFromDate, 20);
   const daysOfWeek = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+  const router = useRouter();
+
+  console.log(sessions);
 
   const fetchSessions = async (limit: number = 20) => {
     setLoading(true);
@@ -104,9 +109,47 @@ export default function SessionAdministrationPage() {
     }
   }, []);
 
+  const calculateTotalHours = (
+    dateRange: { from: Date; to: Date },
+    days: string[],
+    startTime: string,
+    endTime: string
+  ) => {
+    if (
+      !dateRange.from ||
+      !dateRange.to ||
+      !days.length ||
+      !startTime ||
+      !endTime
+    )
+      return 0;
+
+    const totalDays = differenceInDays(dateRange.to, dateRange.from) + 1;
+    const weeksCount = Math.floor(totalDays / 7);
+    const remainingDays = totalDays % 7;
+
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+    const dailyHours =
+      endHour + endMinute / 60 - (startHour + startMinute / 60);
+
+    let totalSessions = weeksCount * days.length;
+
+    const startDayIndex = dateRange.from.getDay();
+    for (let i = 0; i < remainingDays; i++) {
+      const currentDayIndex = (startDayIndex + i) % 7;
+      if (days.includes(daysOfWeek[currentDayIndex])) {
+        totalSessions++;
+      }
+    }
+
+    return totalSessions * dailyHours;
+  };
+
   const createForm = useForm<z.infer<typeof createSessionSchema>>({
     resolver: zodResolver(createSessionSchema),
     defaultValues: {
+      courseid: "",
       dateRange: {
         from: defaultFromDate,
         to: defaultToDate,
@@ -124,6 +167,7 @@ export default function SessionAdministrationPage() {
   const editForm = useForm<z.infer<typeof createSessionSchema>>({
     resolver: zodResolver(createSessionSchema),
     defaultValues: {
+      courseid: "",
       dateRange: {
         from: defaultFromDate,
         to: defaultToDate,
@@ -343,6 +387,16 @@ export default function SessionAdministrationPage() {
               setIsDeleteDialogOpen(true);
             }}>
             <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              router.push(
+                `/admin/dashboard/students-detailes/${row.original._id}`
+              )
+            }>
+            <Users className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -583,6 +637,15 @@ export default function SessionAdministrationPage() {
                     ))}
                   </div>
                 </div>
+                <div className="text-sm">
+                  Total Hours:{" "}
+                  {calculateTotalHours(
+                    createForm.watch("dateRange"),
+                    createForm.watch("days"),
+                    createForm.watch("startTime"),
+                    createForm.watch("endTime")
+                  ).toFixed(2)}
+                </div>
                 <div className="flex items-center space-x-8">
                   <FormField
                     name="price"
@@ -698,7 +761,10 @@ export default function SessionAdministrationPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Select Course</FormLabel>
-                    <Select onValueChange={field.onChange} disabled value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      disabled
+                      value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a course" />
@@ -724,7 +790,7 @@ export default function SessionAdministrationPage() {
                     <FormItem className="flex flex-col">
                       <FormLabel className="mb-2">Date Range</FormLabel>
                       <Popover>
-                        <PopoverTrigger asChild className='py-4'>
+                        <PopoverTrigger asChild className="py-4">
                           <Button
                             variant={"outline"}
                             className={cn(
@@ -747,27 +813,27 @@ export default function SessionAdministrationPage() {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto " align="start">
-                        <Calendar
-                              initialFocus
-                              mode="range"
-                              defaultMonth={field.value?.from}
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              numberOfMonths={2}
-                              className="w-auto"
-                              today={currentDate}
-                              disabled={(date) => {
-                                const today = new Date();
-                                today.setHours(0, 0, 0, 0);
-                                const fiveDaysAgo = new Date(
-                                  today.setDate(today.getDate() + 5)
-                                );
-                                return (
-                                  date < fiveDaysAgo ||
-                                  date < new Date("1900-01-01")
-                                );
-                              }}
-                            />
+                          <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={field.value?.from}
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            numberOfMonths={2}
+                            className="w-auto"
+                            today={currentDate}
+                            disabled={(date) => {
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              const fiveDaysAgo = new Date(
+                                today.setDate(today.getDate() + 5)
+                              );
+                              return (
+                                date < fiveDaysAgo ||
+                                date < new Date("1900-01-01")
+                              );
+                            }}
+                          />
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -828,6 +894,15 @@ export default function SessionAdministrationPage() {
                     />
                   ))}
                 </div>
+              </div>
+              <div className="text-sm">
+                Total Hours:{" "}
+                {calculateTotalHours(
+                  editForm.watch("dateRange"),
+                  editForm.watch("days"),
+                  editForm.watch("startTime"),
+                  editForm.watch("endTime")
+                ).toFixed(2)}
               </div>
               <div className="flex space-x-4">
                 <FormField
@@ -914,11 +989,6 @@ export default function SessionAdministrationPage() {
                 />
               </div>
               <DialogFooter>
-                {/* <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}>
-                  Cancel
-                </Button> */}
                 <Button type="submit" disabled={isUpdating}>
                   {isUpdating ? "Updating..." : "Save changes"}
                 </Button>

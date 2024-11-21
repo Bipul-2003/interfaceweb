@@ -3,18 +3,19 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 
 export interface UserType extends Document {
-    username: string;
-    email: string;
-    phonenumber: string;
-    password: string;
-    firstname: string;
-    middlename: string;
-    lastname: string;
-    isVerified: boolean;
-    verifyCode: string;
-    verifyCodeExpire: Date;
-    role: number;
+  username: string;
+  email: string;
+  phonenumber: string;
+  password: string;
+  firstname: string;
+  middlename: string;
+  lastname: string;
+  isVerified: boolean;
+  verifyCode?: string | null;
+  verifyCodeExpire?: Date | null;
+  role: number;
 }
+
 
 // Updated User schema
 const UserSchema: Schema<UserType> = new mongoose.Schema({
@@ -72,11 +73,11 @@ const UserSchema: Schema<UserType> = new mongoose.Schema({
     },
     verifyCode: {
       type: String,
-      required: [true, "VerifyCode required"],
+      default: null,
     },
     verifyCodeExpire: {
       type: Date,
-      required: [true, "VerifyCodeExpire required"],
+      default: null,
     },
     role: {
       type: Number,
