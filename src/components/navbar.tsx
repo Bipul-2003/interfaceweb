@@ -90,7 +90,7 @@ function MobileMenu({ user }: { user: User | null }) {
           <MobileAccordionItem title="Offerings">
             <MobileMenuItem href="/courses" label="Training & Workshops" />
             <MobileMenuItem href="/" label="Products" />
-            <MobileMenuItem href="/" label="Services" />
+            <MobileMenuItem href="/services" label="Services" />
           </MobileAccordionItem>
           <MobileMenuItem href="/careers" label="Careers" />
           <MobileMenuItem href="/about-us" label="About Us" />
