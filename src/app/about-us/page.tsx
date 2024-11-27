@@ -6,16 +6,16 @@ import React from "react";
 
 export default function AboutUs() {
   return (
-    <div className="pt-12">
+    <div className="pt-16">
       <div className="w-full">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container px-4 md:px-6 max-w-5xl">
-            <div className="flex items-center justify-center ">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-[url('/background.jpg')] bg-cover bg-left-top rounded-3xl">
+          <div className="container px-4 md:px-6 max-w-5xl ">
+            <div className="flex items-center justify-center  ">
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center">
                   Delivering Exceptional IT Services, Products, and Training
                 </h2>
-                <p className=" text-center text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className=" text-center text-muted md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 &quot; Our success is measured by how successful our customers are.&quot;
                 </p>
               </div>

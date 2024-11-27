@@ -20,7 +20,7 @@ export function UserNav({
   user,
 }: {
   logout: () => void
-  user: { username: string }
+  user: { username: string, role:number }
 }) {
   const [open, setOpen] = useState(false)
 
@@ -51,11 +51,11 @@ export function UserNav({
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+       {user.role==1 && <DropdownMenuItem asChild>
           <Link href="/admin/dashboard" onClick={() => handleSelect()}>
             Dashboard
           </Link>
-        </DropdownMenuItem>
+        </DropdownMenuItem>}
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/user/profile" onClick={() => handleSelect()}>

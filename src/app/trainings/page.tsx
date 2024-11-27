@@ -7,12 +7,12 @@ import React from "react";
 
 export default function Trainings() {
   return (
-    <main className="flex-1">
-      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary/40">
+    <main className="flex-1 pt-12">
+      <section className="w-full py-12 md:py-20 bg-primary/50 rounded-3xl">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold  sm:text-4xl md:text-5xl lg:text-6xl/none">
+              <h1 className="text-3xl font-bold  sm:text-4xl md:text-5xl lg:text-5xl/none">
                 Cutting-Edge IT Training at Interface Hub
               </h1>
               <p className="mx-auto max-w-[900px] py-4 text-black md:text-lg">
@@ -36,9 +36,9 @@ export default function Trainings() {
 
       <section
         id="who-should-attend"
-        className="w-full py-12 md:py-24 lg:py-32">
+        className="w-full py-12 md:py-24">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl  text-center mb-8">
             Who Should Attend?
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -82,10 +82,10 @@ export default function Trainings() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
             <div className="flex flex-col justify-center space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl ">
                 Our Success Story
               </h2>
-              <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed ">
                 With a legacy spanning over two decades, we&apos;ve delivered
                 top-notch IT education that leads to real-world success. Our
                 alumni network boasts professionals working at top-tier
@@ -126,10 +126,10 @@ export default function Trainings() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl ">
                 Join us at Interface Hub
               </h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed ">
                 Take the next step towards a brighter future in IT! Our
                 comprehensive programs and industry-aligned curriculum will
                 prepare you for success in the ever-evolving tech landscape.

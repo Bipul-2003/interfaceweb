@@ -1,18 +1,58 @@
-
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
+interface JobOpening {
+  title: string;
+  description: string;
+  type: string;
+}
+
+const jobOpenings: JobOpening[] = []
+
+// const jobOpenings: JobOpening[] = [
+//   {
+//     title: "Senior Software Engineer",
+//     description: "Lead the development of our core web application and APIs.",
+//     type: "Full-time",
+//   },
+//   {
+//     title: "Product Designer",
+//     description: "Design intuitive and visually appealing user interfaces.",
+//     type: "Full-time",
+//   },
+//   {
+//     title: "Content Strategist",
+//     description: "Develop and execute content strategies to engage our audience.",
+//     type: "Full-time",
+//   },
+//   {
+//     title: "Marketing Coordinator",
+//     description: "Support our marketing team in executing campaigns and events.",
+//     type: "Full-time",
+//   },
+//   {
+//     title: "Customer Success Manager",
+//     description: "Ensure our customers have a delightful experience with our product.",
+//     type: "Full-time",
+//   },
+//   {
+//     title: "Technical Writer",
+//     description: "Create clear and engaging documentation for our products and services.",
+//     type: "Full-time",
+//   },
+// ];
+
 export default function Component() {
   return (
-    <div className="flex flex-col pt-20 min-h-dvh">
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-[url('/background.jpg')]  bg-cover">
+    <div className="flex flex-col pt-12 min-h-dvh">
+      <section className="w-full py-12 md:py-20  bg-[url('/background.jpg')]  bg-cover">
         <div className="container px-4 md:px-6 grid gap-10 lg:grid-cols-[1fr_400px] lg:gap-16">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold  sm:text-5xl md:text-6xl">
+            <h1 className="text-4xl font-bold  sm:text-5xl md:text-5xl">
               Join the Interface Hub Team
             </h1>
-            <p className="text-primary-foreground/80 max-w-[600px] text-xl md:text-2xl py-4">
-              At Interface Hub, we &apos;re empowering the small bussiness with cutting edge technologies. Come be a part of our talented and
+            <p className="text-primary-foreground/80 max-w-[600px] text-xl md:text-xl py-4">
+              At Interface Hub, we&apos;re empowering small businesses with cutting edge technologies. Come be a part of our talented and
               passionate team.
             </p>
             <Link
@@ -65,145 +105,49 @@ export default function Component() {
           </div>
         </div>
       </section>
-      <section className="w-full py-12 md:py-24 lg:py-32 "  id="openings" >
+      <section className="w-full py-12 md:py-24 lg:py-32" id="openings">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Senior Software Engineer</CardTitle>
-                <CardDescription>Lead the development of our core web application and APIs.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Designer</CardTitle>
-                <CardDescription>Design intuitive and visually appealing user interfaces.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Content Strategist</CardTitle>
-                <CardDescription>Develop and execute content strategies to engage our audience.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Marketing Coordinator</CardTitle>
-                <CardDescription>Support our marketing team in executing campaigns and events.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Success Manager</CardTitle>
-                <CardDescription>Ensure our customers have a delightful experience with our product.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Technical Writer</CardTitle>
-                <CardDescription>
-                  Create clear and engaging documentation for our products and services.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-muted-foreground">
-                    <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
-                    Full-time
-                  </div>
-                  <Link
-                    href="#"
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Apply
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {jobOpenings.length > 0 ? (
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {jobOpenings.map((job, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle>{job.title}</CardTitle>
+                    <CardDescription>{job.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="text-muted-foreground">
+                        <CalendarDaysIcon className="mr-2 inline-block h-4 w-4" />
+                        {job.type}
+                      </div>
+                      <Link
+                        href="#"
+                        className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                        prefetch={false}
+                      >
+                        Apply
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold mb-4">No Current Openings</h2>
+              <p className="text-muted-foreground">
+                We don&apos;t have any open positions at the moment, but please check back later or follow us on social media for updates.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </div>
   )
 }
 
-function CalendarDaysIcon(props:any) {
+function CalendarDaysIcon(props: any) {
   return (
     <svg
       {...props}
@@ -231,8 +175,7 @@ function CalendarDaysIcon(props:any) {
   )
 }
 
-
-function CheckIcon(props:any) {
+function CheckIcon(props: any) {
   return (
     <svg
       {...props}
@@ -251,23 +194,3 @@ function CheckIcon(props:any) {
   )
 }
 
-
-function XIcon(props:any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
-}
