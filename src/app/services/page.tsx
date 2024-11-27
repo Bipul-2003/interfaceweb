@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Code, Headphones, Zap } from 'lucide-react'
 import Image from "next/image"
+import Link from "next/link"
 
 export default function ServicesPage() {
   return (
@@ -163,8 +164,10 @@ function CTASection() {
       <p className="text-xl max-w-3xl mx-auto">
         Whether you need ongoing IT support for your existing applications or are looking to develop custom solutions that drive growth, Interface Hub is your partner for success.
       </p>
-      <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+      <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
+        <Link href="/contact-us">
         Contact Us
+        </Link>
       </Button>
     </section>
   )
