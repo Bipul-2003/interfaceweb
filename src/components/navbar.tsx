@@ -52,7 +52,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-background p-4">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-background p-3">
       <div className="mx-auto flex items-center justify-between">
         <MobileMenu user={user} />
         <Logo />
@@ -89,7 +89,7 @@ function MobileMenu({ user }: { user: User | null }) {
           <MobileMenuItem href="/" label="Home" />
           <MobileAccordionItem title="Offerings">
             <MobileMenuItem href="/courses" label="Training & Workshops" />
-            <MobileMenuItem href="/" label="Products" />
+            <MobileMenuItem href="/products" label="Products" />
             <MobileMenuItem href="/services" label="Services" />
           </MobileAccordionItem>
           <MobileMenuItem href="/careers" label="Careers" />
@@ -153,7 +153,7 @@ function DesktopMenu() {
                 description="Coming soon"
                 className="text-gray-400"
               />
-              <DesktopMenuItem href="/" label="Products" />
+              <DesktopMenuItem href="/products" label="Products" />
               <DesktopMenuItem href="/services" label="Services" />
             </ul>
           </NavigationMenuContent>
